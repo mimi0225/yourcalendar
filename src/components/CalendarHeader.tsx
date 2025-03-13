@@ -11,7 +11,12 @@ import {
 } from '@/components/ui/select';
 import { ViewType } from '@/types/calendar';
 import { format } from 'date-fns';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Palette } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const CalendarHeader = () => {
   const { 
@@ -23,8 +28,13 @@ const CalendarHeader = () => {
     setSelectedView,
     activeTheme,
     themeOptions,
-    setActiveTheme
+    setActiveTheme,
+    activeCalendarTheme,
+    calendarThemeOptions,
+    setActiveCalendarTheme
   } = useCalendar();
+
+  const [themePopoverOpen, setThemePopoverOpen] = useState(false);
 
   const viewOptions: { value: ViewType; label: string }[] = [
     { value: 'month', label: 'Month' },
@@ -89,31 +99,52 @@ const CalendarHeader = () => {
           </SelectContent>
         </Select>
         
-        <Select
-          value={activeTheme}
-          onValueChange={setActiveTheme}
-        >
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="Theme" />
-          </SelectTrigger>
-          <SelectContent>
-            {themeOptions.map((theme) => (
-              <SelectItem 
-                key={theme.value} 
-                value={theme.value}
-                className="flex items-center"
-              >
-                <div className="flex items-center">
-                  <div 
-                    className="w-4 h-4 rounded-full mr-2" 
-                    style={{ backgroundColor: theme.bgColor }}
-                  ></div>
-                  {theme.name}
+        <Popover open={themePopoverOpen} onOpenChange={setThemePopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="icon">
+              <Palette className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-72">
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium mb-2">App Theme</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {themeOptions.map((theme) => (
+                    <button
+                      key={theme.value}
+                      className={`p-2 rounded-md border ${activeTheme === theme.value ? 'ring-2 ring-primary' : ''}`}
+                      onClick={() => setActiveTheme(theme.value)}
+                    >
+                      <div className="flex flex-col items-center gap-1">
+                        <div
+                          className="w-6 h-6 rounded-full"
+                          style={{ backgroundColor: theme.bgColor }}
+                        ></div>
+                        <span className="text-xs">{theme.name}</span>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+              </div>
+
+              <div>
+                <h4 className="font-medium mb-2">Calendar Colors</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  {calendarThemeOptions.map((theme) => (
+                    <button
+                      key={theme.value}
+                      className={`p-2 rounded-md border ${activeCalendarTheme === theme.value ? 'ring-2 ring-primary' : ''}`}
+                      onClick={() => setActiveCalendarTheme(theme.value)}
+                    >
+                      <span className="text-sm">{theme.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </header>
   );

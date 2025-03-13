@@ -8,10 +8,10 @@ import EventList from '@/components/EventList';
 import AddEventForm from '@/components/AddEventForm';
 
 const CalendarApp = () => {
-  const { selectedView } = useCalendar();
+  const { selectedView, activeCalendarTheme } = useCalendar();
   
   return (
-    <div className="container max-w-7xl py-4">
+    <div className={`container max-w-7xl py-4 ${activeCalendarTheme}`}>
       <CalendarHeader />
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

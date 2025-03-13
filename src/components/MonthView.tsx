@@ -15,7 +15,13 @@ import { CalendarEvent } from '@/types/calendar';
 import { cn } from '@/lib/utils';
 
 const MonthView = () => {
-  const { currentMonth, selectedDate, setSelectedDate, getEventsForDate } = useCalendar();
+  const { 
+    currentMonth, 
+    selectedDate, 
+    setSelectedDate, 
+    getEventsForDate,
+    getDefaultColorForType
+  } = useCalendar();
   
   // Calculate days to display in the calendar grid
   const monthStart = startOfMonth(currentMonth);
@@ -38,9 +44,9 @@ const MonthView = () => {
         {visibleEvents.map((event) => (
           <div 
             key={event.id}
-            className="calendar-event"
+            className={`calendar-event ${event.type}-type`}
             style={{ 
-              backgroundColor: event.color || '#9b87f5',
+              backgroundColor: event.color || getDefaultColorForType(event.type),
               color: event.color && isLightColor(event.color) ? 'black' : 'white'
             }}
           >

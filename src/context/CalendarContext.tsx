@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CalendarEvent, ThemeOption, ViewType } from '@/types/calendar';
+import { CalendarEvent, ThemeOption, ViewType, CalendarTheme } from '@/types/calendar';
 import { addDays, subDays, startOfMonth, endOfMonth, format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,6 +12,15 @@ export const themeOptions: ThemeOption[] = [
   { name: 'Rose', value: 'theme-rose', bgColor: '#FFDEE2', textColor: 'black' },
   { name: 'Sky', value: 'theme-sky', bgColor: '#D3E4FD', textColor: 'black' },
   { name: 'Lemon', value: 'theme-lemon', bgColor: '#FEF7CD', textColor: 'black' },
+];
+
+// Available calendar theme options
+export const calendarThemeOptions = [
+  { name: 'Pastel', value: 'calendar-theme-pastel' },
+  { name: 'Warm', value: 'calendar-theme-warm' },
+  { name: 'Cool', value: 'calendar-theme-cool' },
+  { name: 'Bright', value: 'calendar-theme-bright' },
+  { name: 'Subtle', value: 'calendar-theme-subtle' },
 ];
 
 // Sample events for demo purposes
@@ -48,7 +57,9 @@ interface CalendarContextType {
   selectedView: ViewType;
   currentMonth: Date;
   activeTheme: string;
+  activeCalendarTheme: string;
   themeOptions: ThemeOption[];
+  calendarThemeOptions: { name: string; value: string }[];
   getEventsForDate: (date: Date) => CalendarEvent[];
   addEvent: (event: Omit<CalendarEvent, 'id'>) => void;
   updateEvent: (event: CalendarEvent) => void;
@@ -59,7 +70,9 @@ interface CalendarContextType {
   prevMonth: () => void;
   goToToday: () => void;
   setActiveTheme: (theme: string) => void;
+  setActiveCalendarTheme: (theme: string) => void;
   toggleEventCompletion: (eventId: string) => void;
+  getDefaultColorForType: (type: EventType) => string;
 }
 
 const CalendarContext = createContext<CalendarContextType | undefined>(undefined);
@@ -70,12 +83,14 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [selectedView, setSelectedView] = useState<ViewType>('month');
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [activeTheme, setActiveTheme] = useState<string>('theme-lavender');
+  const [activeCalendarTheme, setActiveCalendarTheme] = useState<string>('calendar-theme-pastel');
   const { toast } = useToast();
 
   // Load saved data from localStorage when component mounts
   useEffect(() => {
     const savedEvents = localStorage.getItem('calendarEvents');
     const savedTheme = localStorage.getItem('calendarTheme');
+    const savedCalendarTheme = localStorage.getItem('calendarColorTheme');
     
     if (savedEvents) {
       try {
@@ -93,11 +108,14 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     
     if (savedTheme) {
       setActiveTheme(savedTheme);
-      // Apply theme to body
-      document.body.className = savedTheme;
-    } else {
-      document.body.className = activeTheme;
     }
+    
+    if (savedCalendarTheme) {
+      setActiveCalendarTheme(savedCalendarTheme);
+    }
+
+    // Apply themes to body
+    document.body.className = `${activeTheme} ${activeCalendarTheme}`;
   }, []);
 
   // Save events to localStorage whenever they change
@@ -108,8 +126,16 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Save theme to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('calendarTheme', activeTheme);
-    document.body.className = activeTheme;
-  }, [activeTheme]);
+    localStorage.setItem('calendarColorTheme', activeCalendarTheme);
+    document.body.className = `${activeTheme} ${activeCalendarTheme}`;
+  }, [activeTheme, activeCalendarTheme]);
+
+  const getDefaultColorForType = (type: EventType): string => {
+    const computedStyle = getComputedStyle(document.documentElement);
+    return type === 'reminder' 
+      ? computedStyle.getPropertyValue('--calendar-reminder-color').trim()
+      : computedStyle.getPropertyValue('--calendar-routine-color').trim();
+  };
 
   const getEventsForDate = (date: Date) => {
     return events.filter(event => {
@@ -122,6 +148,8 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const newEvent = {
       ...event,
       id: crypto.randomUUID(),
+      // Use default color from theme if none provided
+      color: event.color || getDefaultColorForType(event.type),
     };
     
     setEvents(prev => [...prev, newEvent]);
@@ -190,7 +218,9 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         selectedView,
         currentMonth,
         activeTheme,
+        activeCalendarTheme,
         themeOptions,
+        calendarThemeOptions,
         getEventsForDate,
         addEvent,
         updateEvent,
@@ -201,7 +231,9 @@ export const CalendarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         prevMonth,
         goToToday,
         setActiveTheme,
+        setActiveCalendarTheme,
         toggleEventCompletion,
+        getDefaultColorForType,
       }}
     >
       {children}

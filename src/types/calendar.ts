@@ -19,4 +19,11 @@ export interface ThemeOption {
   textColor: string;
 }
 
+export interface CalendarTheme {
+  reminderColor: string;
+  routineColor: string;
+  todayHighlight: string;
+  selectedHighlight: string;
+}
+
 export type ViewType = 'month' | 'week' | 'day';
