@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useCalendar } from '@/context/CalendarContext';
 import { Button } from '@/components/ui/button';
@@ -46,7 +45,7 @@ const CalendarHeader = () => {
     <header className="flex flex-col sm:flex-row justify-between items-center p-4 mb-4 gap-3">
       <div className="flex items-center">
         <Calendar className="h-6 w-6 mr-2" />
-        <h1 className="text-2xl font-bold">Colorful Calendar</h1>
+        <h1 className="text-2xl font-bold">Your Calendar</h1>
       </div>
       
       <div className="flex items-center gap-2">
