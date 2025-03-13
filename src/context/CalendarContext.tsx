@@ -1,6 +1,5 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { CalendarEvent, ThemeOption, ViewType, CalendarTheme } from '@/types/calendar';
+import { CalendarEvent, ThemeOption, ViewType, CalendarTheme, EventType } from '@/types/calendar';
 import { addDays, subDays, startOfMonth, endOfMonth, format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 
