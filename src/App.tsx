@@ -9,6 +9,24 @@ import Index from "./pages/Index";
 import Student from "./pages/Student";
 import NotFound from "./pages/NotFound";
 
+// Create a function to register the service worker
+const registerServiceWorker = () => {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(registration => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch(error => {
+          console.error('Service Worker registration failed:', error);
+        });
+    });
+  }
+};
+
+// Register the service worker
+registerServiceWorker();
+
 const queryClient = new QueryClient();
 
 const App = () => (
