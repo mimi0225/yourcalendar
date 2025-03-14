@@ -1,66 +1,75 @@
 
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCalendar } from '@/context/CalendarContext';
+import { Button } from '@/components/ui/button';
+import { Bell } from 'lucide-react';
+import { addDays, format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 import NotificationPermission from './NotificationPermission';
-import { toast } from '@/hooks/use-toast';
 
 const CalendarNotifications = () => {
+  const [permissionState, setPermissionState] = useState<NotificationPermission | null>(null);
   const { events } = useCalendar();
+  const { toast } = useToast();
+  
+  // Check if Notification API is available
+  const isNotificationSupported = typeof window !== 'undefined' && 'Notification' in window;
 
   useEffect(() => {
+    // Only run this if Notification API is available
+    if (!isNotificationSupported) return;
+    
+    // Check permission status
+    setPermissionState(Notification.permission);
+    
     // Schedule notifications for upcoming events
-    const checkUpcomingEvents = () => {
-      if (Notification.permission !== 'granted') return;
-      
-      const now = new Date();
-      const tomorrow = new Date(now);
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      
-      // Find events in the next 24 hours
-      const upcomingEvents = events.filter(event => {
-        const eventDate = new Date(event.date);
-        return eventDate >= now && eventDate <= tomorrow;
-      });
-      
-      // Send notification for each upcoming event (in a real app, you'd probably want to batch these)
-      upcomingEvents.forEach(event => {
-        const timeUntilEvent = new Date(event.date).getTime() - now.getTime();
-        
-        // Only notify if the event is soon but not already passed
-        if (timeUntilEvent > 0 && timeUntilEvent < 24 * 60 * 60 * 1000) {
-          // For this example, we'll simulate a push by showing a standard notification
-          // In a production app, you'd register with a push service
-          if ('serviceWorker' in navigator && 'PushManager' in window) {
-            // This would be your server-side push notification in a real app
-            // Here we're just simulating with a direct notification
-            new Notification(`Upcoming: ${event.title}`, {
-              body: event.time ? `Today at ${event.time}` : 'Today',
-              icon: '/favicon.ico'
-            });
-          }
-        }
-      });
-    };
-    
-    // Check for upcoming events every 30 minutes
-    const intervalId = setInterval(checkUpcomingEvents, 30 * 60 * 1000);
-    
-    // Initial check
-    checkUpcomingEvents();
-    
-    return () => clearInterval(intervalId);
+    if (Notification.permission === 'granted') {
+      scheduleNotifications();
+    }
   }, [events]);
   
-  const handlePermissionChange = (permission: NotificationPermission) => {
-    if (permission === 'granted') {
-      // You could store this preference in your CalendarContext or localStorage
-      localStorage.setItem('notificationsEnabled', 'true');
+  const scheduleNotifications = () => {
+    // Return if notifications aren't supported
+    if (!isNotificationSupported) return;
+    
+    const tomorrow = addDays(new Date(), 1);
+    const tomorrowEvents = events.filter(event => {
+      const eventDate = new Date(event.date);
+      return format(eventDate, 'yyyy-MM-dd') === format(tomorrow, 'yyyy-MM-dd');
+    });
+    
+    if (tomorrowEvents.length > 0) {
+      // Show a toast notification for demo purposes
+      toast({
+        title: "Upcoming Events",
+        description: `You have ${tomorrowEvents.length} event(s) tomorrow.`,
+      });
+      
+      // Actually schedule the notification
+      if (isNotificationSupported) {
+        setTimeout(() => {
+          try {
+            new Notification("Calendar Reminder", {
+              body: `You have ${tomorrowEvents.length} event(s) scheduled for tomorrow.`,
+              icon: "/favicon.ico"
+            });
+          } catch (error) {
+            console.error("Failed to create notification:", error);
+          }
+        }, 5000); // 5 seconds delay for demo
+      }
     }
   };
   
+  if (!isNotificationSupported) {
+    return null; // Don't render anything if notifications aren't supported
+  }
+  
   return (
-    <div className="flex items-center justify-end mb-4">
-      <NotificationPermission onPermissionChange={handlePermissionChange} />
+    <div>
+      {permissionState !== 'granted' && (
+        <NotificationPermission onPermissionChange={setPermissionState} />
+      )}
     </div>
   );
 };
