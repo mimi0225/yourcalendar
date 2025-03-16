@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,6 +11,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   signUp: (email: string, password: string) => Promise<boolean>;
+  resetPassword: (email: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -22,7 +22,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user is stored in localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -36,8 +35,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // In a real app, this would validate against a server
-      // For now, we'll check localStorage for the user
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       const foundUser = users.find(
         (u: any) => u.email === email && u.password === password
@@ -73,8 +70,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string): Promise<boolean> => {
     try {
-      // In a real app, this would register with a server
-      // For now, we'll store in localStorage
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       
       if (users.some((u: any) => u.email === email)) {
@@ -95,7 +90,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       users.push(newUser);
       localStorage.setItem('users', JSON.stringify(users));
       
-      // Auto-login after signup
       const userObj = { email: newUser.email, id: newUser.id };
       localStorage.setItem('user', JSON.stringify(userObj));
       setUser(userObj);
@@ -109,6 +103,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Signup error:', error);
       toast({
         title: "Registration error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const resetPassword = async (email: string): Promise<boolean> => {
+    try {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userExists = users.some((u: any) => u.email === email);
+      
+      if (!userExists) {
+        toast({
+          title: "User not found",
+          description: "No account exists with this email address",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      const resetToken = crypto.randomUUID();
+      const resetRequests = JSON.parse(localStorage.getItem('resetRequests') || '[]');
+      
+      resetRequests.push({
+        email,
+        token: resetToken,
+        expires: new Date(Date.now() + 3600000).toISOString(),
+      });
+      
+      localStorage.setItem('resetRequests', JSON.stringify(resetRequests));
+      
+      toast({
+        title: "Password reset email sent",
+        description: `If ${email} is registered, you'll receive instructions to reset your password.`,
+      });
+      
+      return true;
+    } catch (error) {
+      console.error('Password reset error:', error);
+      toast({
+        title: "Reset error",
         description: "An unexpected error occurred",
         variant: "destructive",
       });
@@ -132,6 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: !!user,
         login,
         signUp,
+        resetPassword,
         logout,
       }}
     >

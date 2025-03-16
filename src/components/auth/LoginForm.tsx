@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, KeyRound, Loader2 } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -19,15 +19,27 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 const LoginForm = () => {
-  const { login, signUp } = useAuth();
+  const { login, signUp, resetPassword } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetLoading, setIsResetLoading] = useState(false);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +62,20 @@ const LoginForm = () => {
       await signUp(signupEmail, signupPassword);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResetLoading(true);
+    try {
+      const success = await resetPassword(resetEmail);
+      if (success) {
+        setResetDialogOpen(false);
+        setResetEmail('');
+      }
+    } finally {
+      setIsResetLoading(false);
     }
   };
 
@@ -99,6 +125,57 @@ const LoginForm = () => {
                   />
                 </div>
               </div>
+              <Dialog open={resetDialogOpen} onOpenChange={setResetDialogOpen}>
+                <div className="text-right">
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="text-sm p-0 h-auto" type="button">
+                      Forgot password?
+                    </Button>
+                  </DialogTrigger>
+                </div>
+                <DialogContent>
+                  <form onSubmit={handleResetPassword}>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <KeyRound className="h-5 w-5 text-primary" />
+                        Reset Password
+                      </DialogTitle>
+                      <DialogDescription>
+                        Enter your email address below and we'll send you instructions to reset your password.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="reset-email">Email</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="reset-email"
+                            type="email"
+                            placeholder="your.email@example.com"
+                            className="pl-9"
+                            value={resetEmail}
+                            onChange={(e) => setResetEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit" disabled={isResetLoading}>
+                        {isResetLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          "Send Instructions"
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full" disabled={isLoading}>
