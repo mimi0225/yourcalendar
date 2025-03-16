@@ -33,17 +33,10 @@ const CalendarApp = () => {
       <div className="flex flex-col mb-4">
         <div className="flex justify-between items-center">
           <CalendarHeader />
-          {user ? (
-            <div className="flex items-center gap-4">
-              <div className="text-sm">
-                <span className="text-muted-foreground mr-2">Logged in as:</span>
-                <span className="font-medium">{user.email}</span>
-              </div>
-            </div>
-          ) : null}
+          {/* Removed user info from here */}
         </div>
         
-        {/* Navigation tabs moved below month selection */}
+        {/* Navigation tabs below month selection */}
         <div className="flex justify-center mt-4">
           <div className="flex gap-2">
             <Button asChild variant="outline" size="lg">
@@ -91,7 +84,7 @@ const CalendarApp = () => {
           </div>
           
           {/* Logout section at bottom */}
-          <div className="mt-auto pt-6 border-t border-border flex justify-center">
+          <div className="mt-auto pt-6 border-t border-border flex flex-col items-center">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" size="lg" className="w-full max-w-md">
@@ -115,6 +108,14 @@ const CalendarApp = () => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            
+            {/* Moved logged in status to bottom */}
+            {user && (
+              <div className="mt-4 text-sm text-center">
+                <span className="text-muted-foreground">Logged in as: </span>
+                <span className="font-medium">{user.email}</span>
+              </div>
+            )}
           </div>
         </>
       )}

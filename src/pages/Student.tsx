@@ -31,33 +31,35 @@ const StudentPage = () => {
   
   return (
     <div className="container max-w-7xl py-4 min-h-screen flex flex-col">
-      <div className="flex justify-between items-center mb-6">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold">Student Dashboard</h1>
-          <p className="text-muted-foreground">
-            Manage your classes, assignments, and tests
-          </p>
+      <div className="flex flex-col mb-6">
+        <div className="flex justify-between items-center">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold">Student Dashboard</h1>
+            <p className="text-muted-foreground">
+              Manage your classes, assignments, and tests
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-4">
-          {user ? (
-            <div className="flex items-center gap-4">
-              <div className="text-sm">
-                <span className="text-muted-foreground mr-2">Logged in as:</span>
-                <span className="font-medium">{user.email}</span>
-              </div>
-            </div>
-          ) : null}
+        
+        {/* Navigation tabs moved below header */}
+        <div className="flex justify-center mt-4">
           <div className="flex gap-2">
-            <Button asChild variant="outline">
-              <Link to="/period">
-                <Droplet className="mr-2 h-4 w-4" />
-                Period
-              </Link>
-            </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="lg">
               <Link to="/">
                 <Calendar className="mr-2 h-4 w-4" />
                 Calendar
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/student">
+                <GraduationCap className="mr-2 h-4 w-4" />
+                <span className="font-medium">Student</span>
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/period">
+                <Droplet className="mr-2 h-4 w-4" />
+                Period
               </Link>
             </Button>
           </div>
@@ -71,7 +73,7 @@ const StudentPage = () => {
       ) : (
         <>
           <Tabs defaultValue="overview" className="flex-grow">
-            <TabsList className="mb-6">
+            <TabsList className="mb-6 flex justify-center">
               <TabsTrigger value="overview">
                 <LayoutGrid className="mr-1 h-4 w-4" />
                 Overview
@@ -117,7 +119,7 @@ const StudentPage = () => {
           </Tabs>
           
           {/* Logout section at bottom */}
-          <div className="mt-auto pt-6 border-t border-border flex justify-center">
+          <div className="mt-auto pt-6 border-t border-border flex flex-col items-center">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" size="lg" className="w-full max-w-md">
@@ -141,6 +143,14 @@ const StudentPage = () => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
+            
+            {/* Moved logged in status to bottom */}
+            {user && (
+              <div className="mt-4 text-sm text-center">
+                <span className="text-muted-foreground">Logged in as: </span>
+                <span className="font-medium">{user.email}</span>
+              </div>
+            )}
           </div>
         </>
       )}

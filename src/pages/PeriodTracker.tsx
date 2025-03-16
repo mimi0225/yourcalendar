@@ -32,14 +32,7 @@ const PeriodTrackerPage: React.FC = () => {
               Track and manage your cycle
             </p>
           </div>
-          {user ? (
-            <div className="flex items-center gap-4">
-              <div className="text-sm">
-                <span className="text-muted-foreground mr-2">Logged in as:</span>
-                <span className="font-medium">{user.email}</span>
-              </div>
-            </div>
-          ) : null}
+          {/* Removed user info from here */}
         </div>
         
         {/* Navigation tabs below header */}
@@ -79,7 +72,7 @@ const PeriodTrackerPage: React.FC = () => {
       
       {/* Logout section at bottom */}
       {isAuthenticated && (
-        <div className="mt-auto pt-6 border-t border-border flex justify-center">
+        <div className="mt-auto pt-6 border-t border-border flex flex-col items-center">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline" size="lg" className="w-full max-w-md">
@@ -103,6 +96,14 @@ const PeriodTrackerPage: React.FC = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          
+          {/* Moved logged in status to bottom */}
+          {user && (
+            <div className="mt-4 text-sm text-center">
+              <span className="text-muted-foreground">Logged in as: </span>
+              <span className="font-medium">{user.email}</span>
+            </div>
+          )}
         </div>
       )}
     </div>
