@@ -12,7 +12,7 @@ import AddTestForm from '@/components/student/AddTestForm';
 import LoginForm from '@/components/auth/LoginForm';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Calendar, GraduationCap, Clock, BookOpen, LayoutGrid, LogOut, AlertTriangle } from 'lucide-react';
+import { Calendar, GraduationCap, Clock, BookOpen, LayoutGrid, LogOut, AlertTriangle, Droplet } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,12 +47,20 @@ const StudentPage = () => {
               </div>
             </div>
           ) : null}
-          <Button asChild variant="outline">
-            <Link to="/">
-              <Calendar className="mr-2 h-4 w-4" />
-              Calendar
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link to="/period">
+                <Droplet className="mr-2 h-4 w-4" />
+                Period
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/">
+                <Calendar className="mr-2 h-4 w-4" />
+                Calendar
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
       

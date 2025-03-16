@@ -9,7 +9,7 @@ import EventList from '@/components/EventList';
 import AddEventForm from '@/components/AddEventForm';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { GraduationCap, LogOut, AlertTriangle } from 'lucide-react';
+import { GraduationCap, LogOut, AlertTriangle, Droplet } from 'lucide-react';
 import CalendarNotifications from '@/components/CalendarNotifications';
 import LoginForm from '@/components/auth/LoginForm';
 import {
@@ -41,12 +41,20 @@ const CalendarApp = () => {
               </div>
             </div>
           ) : null}
-          <Button asChild variant="outline">
-            <Link to="/student">
-              <GraduationCap className="mr-2 h-4 w-4" />
-              Student
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild variant="outline">
+              <Link to="/period">
+                <Droplet className="mr-2 h-4 w-4" />
+                Period
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/student">
+                <GraduationCap className="mr-2 h-4 w-4" />
+                Student
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
       
