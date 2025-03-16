@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { usePeriod } from '@/context/PeriodContext';
@@ -39,7 +38,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { cn } from '@/lib/utils';
 
-// Define symptom options with labels
 const symptomOptions = [
   { value: 'cramps', label: 'Cramps' },
   { value: 'headache', label: 'Headache' },
@@ -52,7 +50,6 @@ const symptomOptions = [
   { value: 'spotting', label: 'Spotting' },
 ];
 
-// Define flow level options with colors and labels
 const flowOptions = [
   { value: 'none', label: 'None', color: '#E5DEFF' },
   { value: 'light', label: 'Light', color: '#FEC6A1' },
@@ -71,7 +68,6 @@ const formSchema = z.object({
 
 type PeriodFormValues = z.infer<typeof formSchema>;
 
-// Component for adding/editing period entries
 interface PeriodEntryFormProps {
   date?: Date;
   existingEntry?: PeriodEntry;
@@ -100,8 +96,7 @@ const PeriodEntryForm: React.FC<PeriodEntryFormProps> = ({
 
   const onSubmit = (values: PeriodFormValues) => {
     if (isEditing && existingEntry) {
-      updatePeriodEntry({
-        id: existingEntry.id,
+      updatePeriodEntry(existingEntry.id, {
         date: values.date,
         flow: values.flow,
         symptoms: values.symptoms as Symptom[],
