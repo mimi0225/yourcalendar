@@ -30,9 +30,9 @@ const CalendarApp = () => {
   
   return (
     <div className={`container max-w-7xl py-4 ${activeCalendarTheme} min-h-screen flex flex-col`}>
-      <div className="flex justify-between items-center mb-4">
-        <CalendarHeader />
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col mb-4">
+        <div className="flex justify-between items-center">
+          <CalendarHeader />
           {user ? (
             <div className="flex items-center gap-4">
               <div className="text-sm">
@@ -41,17 +41,26 @@ const CalendarApp = () => {
               </div>
             </div>
           ) : null}
+        </div>
+        
+        {/* Navigation tabs moved below month selection */}
+        <div className="flex justify-center mt-4">
           <div className="flex gap-2">
-            <Button asChild variant="outline">
-              <Link to="/period">
-                <Droplet className="mr-2 h-4 w-4" />
-                Period
+            <Button asChild variant="outline" size="lg">
+              <Link to="/">
+                <span className="font-medium">Calendar</span>
               </Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="lg">
               <Link to="/student">
                 <GraduationCap className="mr-2 h-4 w-4" />
                 Student
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/period">
+                <Droplet className="mr-2 h-4 w-4" />
+                Period
               </Link>
             </Button>
           </div>

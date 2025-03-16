@@ -114,8 +114,8 @@ const PeriodCalendar: React.FC = () => {
           custom: (date) => !!getEntryForDate(date),
         }}
         components={{
-          DayContent: ({ date, selectedDay }) => {
-            const isSelected = selectedDay && isSameDay(date, selectedDay);
+          DayContent: ({ date }) => {
+            const isSelected = selectedDate ? isSameDay(date, selectedDate) : false;
             const className = getDayClassNames(date, isSelected);
             
             return (

@@ -4,7 +4,7 @@ import { PeriodProvider } from '@/context/PeriodContext';
 import PeriodTracker from '@/components/period/PeriodTracker';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Calendar, LogOut, AlertTriangle } from 'lucide-react';
+import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import LoginForm from '@/components/auth/LoginForm';
 import {
@@ -24,14 +24,14 @@ const PeriodTrackerPage: React.FC = () => {
   
   return (
     <div className="container max-w-7xl py-4 min-h-screen flex flex-col">
-      <div className="flex justify-between items-center mb-6">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold">Period Tracker</h1>
-          <p className="text-muted-foreground">
-            Track and manage your cycle
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col mb-6">
+        <div className="flex justify-between items-center">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold">Period Tracker</h1>
+            <p className="text-muted-foreground">
+              Track and manage your cycle
+            </p>
+          </div>
           {user ? (
             <div className="flex items-center gap-4">
               <div className="text-sm">
@@ -40,12 +40,30 @@ const PeriodTrackerPage: React.FC = () => {
               </div>
             </div>
           ) : null}
-          <Button asChild variant="outline">
-            <Link to="/">
-              <Calendar className="mr-2 h-4 w-4" />
-              Calendar
-            </Link>
-          </Button>
+        </div>
+        
+        {/* Navigation tabs below header */}
+        <div className="flex justify-center mt-4">
+          <div className="flex gap-2">
+            <Button asChild variant="outline" size="lg">
+              <Link to="/">
+                <Calendar className="mr-2 h-4 w-4" />
+                Calendar
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/student">
+                <GraduationCap className="mr-2 h-4 w-4" />
+                Student
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/period">
+                <Droplet className="mr-2 h-4 w-4" />
+                <span className="font-medium">Period</span>
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
       
