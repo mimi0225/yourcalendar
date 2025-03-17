@@ -4,7 +4,7 @@ import { PeriodProvider } from '@/context/PeriodContext';
 import PeriodTracker from '@/components/period/PeriodTracker';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet } from 'lucide-react';
+import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import LoginForm from '@/components/auth/LoginForm';
 import {
@@ -54,6 +54,12 @@ const PeriodTrackerPage: React.FC = () => {
               <Link to="/period">
                 <Droplet className="mr-2 h-4 w-4" />
                 <span className="font-medium">Period</span>
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/sports">
+                <Trophy className="mr-2 h-4 w-4" />
+                Sports
               </Link>
             </Button>
           </div>

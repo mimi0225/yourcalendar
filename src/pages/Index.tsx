@@ -1,4 +1,3 @@
-
 import { useCalendar, CalendarProvider } from '@/context/CalendarContext';
 import { useAuth } from '@/context/AuthContext';
 import CalendarHeader from '@/components/CalendarHeader';
@@ -9,7 +8,7 @@ import EventList from '@/components/EventList';
 import AddEventForm from '@/components/AddEventForm';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { GraduationCap, LogOut, AlertTriangle, Droplet } from 'lucide-react';
+import { GraduationCap, LogOut, AlertTriangle, Droplet, Trophy } from 'lucide-react';
 import CalendarNotifications from '@/components/CalendarNotifications';
 import LoginForm from '@/components/auth/LoginForm';
 import {
@@ -54,6 +53,12 @@ const CalendarApp = () => {
               <Link to="/period">
                 <Droplet className="mr-2 h-4 w-4" />
                 Period
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg">
+              <Link to="/sports">
+                <Trophy className="mr-2 h-4 w-4" />
+                Sports
               </Link>
             </Button>
           </div>
