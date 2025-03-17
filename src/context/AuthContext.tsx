@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,23 +20,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
+  // Load user data when component mounts
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const loadUserData = () => {
       try {
-        setUser(JSON.parse(storedUser));
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
       } catch (error) {
         console.error('Failed to parse stored user', error);
         localStorage.removeItem('user');
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    loadUserData();
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const usersStr = localStorage.getItem('users');
+      const users = usersStr ? JSON.parse(usersStr) : [];
+      
       const foundUser = users.find(
         (u: any) => u.email === email && u.password === password
       );
@@ -70,7 +81,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string): Promise<boolean> => {
     try {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const usersStr = localStorage.getItem('users');
+      const users = usersStr ? JSON.parse(usersStr) : [];
       
       if (users.some((u: any) => u.email === email)) {
         toast({
@@ -112,7 +124,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string): Promise<boolean> => {
     try {
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const usersStr = localStorage.getItem('users');
+      const users = usersStr ? JSON.parse(usersStr) : [];
       const userExists = users.some((u: any) => u.email === email);
       
       if (!userExists) {
@@ -125,7 +138,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       const resetToken = crypto.randomUUID();
-      const resetRequests = JSON.parse(localStorage.getItem('resetRequests') || '[]');
+      const resetRequestsStr = localStorage.getItem('resetRequests');
+      const resetRequests = resetRequestsStr ? JSON.parse(resetRequestsStr) : [];
       
       resetRequests.push({
         email,
@@ -160,6 +174,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       description: "You have been successfully logged out",
     });
   };
+
+  if (isLoading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
 
   return (
     <AuthContext.Provider

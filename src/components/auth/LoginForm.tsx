@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -40,12 +39,20 @@ const LoginForm = () => {
   const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
   const [resetEmail, setResetEmail] = useState('');
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     setIsLoading(true);
     try {
-      await login(loginEmail, loginPassword);
+      const success = await login(loginEmail, loginPassword);
+      if (!success) {
+        setErrorMessage('Invalid email or password. Please try again.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setErrorMessage('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -53,13 +60,22 @@ const LoginForm = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
+    
     if (signupPassword !== signupConfirmPassword) {
-      alert("Passwords do not match");
+      setErrorMessage("Passwords do not match");
       return;
     }
+    
     setIsLoading(true);
     try {
-      await signUp(signupEmail, signupPassword);
+      const success = await signUp(signupEmail, signupPassword);
+      if (!success) {
+        setErrorMessage('Registration failed. This email may already be in use.');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      setErrorMessage('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -67,13 +83,19 @@ const LoginForm = () => {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage('');
     setIsResetLoading(true);
     try {
       const success = await resetPassword(resetEmail);
       if (success) {
         setResetDialogOpen(false);
         setResetEmail('');
+      } else {
+        setErrorMessage('Password reset failed. Please check your email address.');
       }
+    } catch (error) {
+      console.error('Reset password error:', error);
+      setErrorMessage('An unexpected error occurred. Please try again.');
     } finally {
       setIsResetLoading(false);
     }
@@ -92,6 +114,12 @@ const LoginForm = () => {
             <TabsTrigger value="register">Register</TabsTrigger>
           </TabsList>
         </CardHeader>
+        
+        {errorMessage && (
+          <div className="px-6 -mt-2 mb-2">
+            <p className="text-sm text-destructive">{errorMessage}</p>
+          </div>
+        )}
         
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
@@ -179,7 +207,14 @@ const LoginForm = () => {
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </CardFooter>
           </form>
@@ -234,7 +269,14 @@ const LoginForm = () => {
             </CardContent>
             <CardFooter>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating Account..." : "Create Account"}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </CardFooter>
           </form>
