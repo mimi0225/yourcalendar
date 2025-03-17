@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useStudent } from './StudentContext';
-import { Assignment, Test } from '@/types/calendar';
+import { Assignment, Test, Project } from '@/types/calendar';
 
 interface BlackboardUser {
   id: string;
@@ -30,7 +30,7 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const { toast } = useToast();
-  const { addAssignment, addTest } = useStudent();
+  const { addAssignment, addTest, addProject } = useStudent();
 
   // Load saved connection from localStorage
   useEffect(() => {
@@ -133,6 +133,7 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       // Generate some sample assignments based on the user's institution
       const sampleAssignments = generateSampleAssignments(blackboardUser.institution);
       const sampleTests = generateSampleTests(blackboardUser.institution);
+      const sampleProjects = generateSampleProjects(blackboardUser.institution);
       
       // Add the assignments to the student context
       sampleAssignments.forEach(assignment => {
@@ -143,17 +144,22 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       sampleTests.forEach(test => {
         addTest(test);
       });
+
+      // Add the projects to the student context
+      sampleProjects.forEach(project => {
+        addProject(project);
+      });
       
       setLastSynced(new Date());
       toast({
         title: "Sync Complete",
-        description: `Added ${sampleAssignments.length} assignments and ${sampleTests.length} tests from Blackboard.`,
+        description: `Added ${sampleAssignments.length} assignments, ${sampleTests.length} tests, and ${sampleProjects.length} projects from Blackboard.`,
       });
     } catch (error) {
-      console.error('Failed to sync assignments from Blackboard', error);
+      console.error('Failed to sync from Blackboard', error);
       toast({
         title: "Sync Failed",
-        description: "Could not sync assignments from Blackboard. Please try again later.",
+        description: "Could not sync from Blackboard. Please try again later.",
         variant: "destructive",
       });
     } finally {
@@ -189,12 +195,12 @@ export const useBlackboard = () => {
 // Helper functions to generate sample data
 const generateSampleAssignments = (institution: string): Omit<Assignment, 'id'>[] => {
   const classes = ['CS101', 'MATH201', 'BIO110', 'HIST300', 'ECON250'];
-  const assignmentTypes: Assignment['type'][] = ['homework', 'project', 'paper', 'presentation'];
+  const assignmentTypes: Assignment['type'][] = ['homework', 'paper', 'presentation'];
   
   return Array(Math.floor(Math.random() * 3) + 2).fill(null).map(() => {
     const classPrefix = classes[Math.floor(Math.random() * classes.length)];
     return {
-      title: `${classPrefix} - ${['Assignment', 'Homework', 'Project'][Math.floor(Math.random() * 3)]} ${Math.floor(Math.random() * 10) + 1}`,
+      title: `${classPrefix} - ${['Assignment', 'Homework'][Math.floor(Math.random() * 2)]} ${Math.floor(Math.random() * 10) + 1}`,
       classId: crypto.randomUUID(), // In a real app, this would map to an actual class ID
       dueDate: new Date(Date.now() + (Math.floor(Math.random() * 14) + 1) * 24 * 60 * 60 * 1000), // Random due date in the next 14 days
       type: assignmentTypes[Math.floor(Math.random() * assignmentTypes.length)],
@@ -220,6 +226,39 @@ const generateSampleTests = (institution: string): Omit<Test, 'id'>[] => {
       location: `${['Building', 'Hall', 'Room'][Math.floor(Math.random() * 3)]} ${Math.floor(Math.random() * 400) + 100}`,
       topics: ['Topic 1', 'Topic 2', 'Topic 3'].slice(0, Math.floor(Math.random() * 3) + 1),
       completed: false,
+    };
+  });
+};
+
+const generateSampleProjects = (institution: string): Omit<Project, 'id'>[] => {
+  const classes = ['CS101', 'MATH201', 'BIO110', 'HIST300', 'ECON250'];
+  const projectTypes: Project['type'][] = ['individual', 'group', 'research'];
+  
+  return Array(Math.floor(Math.random() * 2) + 1).fill(null).map(() => {
+    const classPrefix = classes[Math.floor(Math.random() * classes.length)];
+    const hasTeamMembers = Math.random() > 0.5;
+    
+    return {
+      title: `${classPrefix} - ${['Final Project', 'Term Project', 'Research Project'][Math.floor(Math.random() * 3)]}`,
+      classId: crypto.randomUUID(),
+      dueDate: new Date(Date.now() + (Math.floor(Math.random() * 30) + 10) * 24 * 60 * 60 * 1000), // Random due date in the next 10-40 days
+      type: projectTypes[Math.floor(Math.random() * projectTypes.length)],
+      description: `Project from ${institution} Blackboard`,
+      teamMembers: hasTeamMembers ? ['Student 1', 'Student 2', 'Student 3'].slice(0, Math.floor(Math.random() * 3) + 1) : [],
+      milestones: [
+        { 
+          title: 'Proposal', 
+          dueDate: new Date(Date.now() + (Math.floor(Math.random() * 7) + 3) * 24 * 60 * 60 * 1000),
+          completed: Math.random() > 0.7
+        },
+        { 
+          title: 'Draft', 
+          dueDate: new Date(Date.now() + (Math.floor(Math.random() * 14) + 10) * 24 * 60 * 60 * 1000),
+          completed: false
+        }
+      ],
+      completed: false,
+      weight: Math.floor(Math.random() * 20) + 15, // Random weight between 15-35%
     };
   });
 };

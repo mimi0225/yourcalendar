@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Class, Assignment, Test, ClassPriority, AssignmentType, TestType } from '@/types/calendar';
+import { Class, Assignment, Test, Project, ClassPriority, AssignmentType, TestType, ProjectType } from '@/types/calendar';
 import { useToast } from '@/hooks/use-toast';
 
 // Sample class colors
@@ -68,10 +68,42 @@ const sampleTests: Test[] = [
   },
 ];
 
+const sampleProjects: Project[] = [
+  {
+    id: '1',
+    title: 'Final Project',
+    classId: '1',
+    dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+    type: 'group',
+    description: 'Build a simple web application',
+    teamMembers: ['John Doe', 'Jane Smith'],
+    milestones: [
+      {
+        title: 'Project Proposal',
+        dueDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+        completed: true
+      },
+      {
+        title: 'UI Mockups',
+        dueDate: new Date(new Date().setDate(new Date().getDate() + 14)),
+        completed: false
+      },
+      {
+        title: 'Final Submission',
+        dueDate: new Date(new Date().setDate(new Date().getDate() + 30)),
+        completed: false
+      }
+    ],
+    completed: false,
+    weight: 25
+  }
+];
+
 interface StudentContextType {
   classes: Class[];
   assignments: Assignment[];
   tests: Test[];
+  projects: Project[];
   addClass: (newClass: Omit<Class, 'id'>) => void;
   updateClass: (updatedClass: Class) => void;
   deleteClass: (classId: string) => void;
@@ -83,6 +115,11 @@ interface StudentContextType {
   updateTest: (test: Test) => void;
   deleteTest: (testId: string) => void;
   toggleTestCompletion: (testId: string) => void;
+  addProject: (project: Omit<Project, 'id'>) => void;
+  updateProject: (project: Project) => void;
+  deleteProject: (projectId: string) => void;
+  toggleProjectCompletion: (projectId: string) => void;
+  toggleProjectMilestoneCompletion: (projectId: string, milestoneIndex: number) => void;
   getClassById: (classId: string) => Class | undefined;
 }
 
@@ -92,6 +129,7 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [classes, setClasses] = useState<Class[]>(sampleClasses);
   const [assignments, setAssignments] = useState<Assignment[]>(sampleAssignments);
   const [tests, setTests] = useState<Test[]>(sampleTests);
+  const [projects, setProjects] = useState<Project[]>(sampleProjects);
   const { toast } = useToast();
 
   // Load saved data from localStorage when component mounts
@@ -99,6 +137,7 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const savedClasses = localStorage.getItem('studentClasses');
     const savedAssignments = localStorage.getItem('studentAssignments');
     const savedTests = localStorage.getItem('studentTests');
+    const savedProjects = localStorage.getItem('studentProjects');
     
     if (savedClasses) {
       try {
@@ -133,6 +172,23 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.error('Failed to parse saved tests', error);
       }
     }
+    
+    if (savedProjects) {
+      try {
+        const parsedProjects = JSON.parse(savedProjects);
+        const projectsWithDates = parsedProjects.map((project: any) => ({
+          ...project,
+          dueDate: new Date(project.dueDate),
+          milestones: project.milestones.map((milestone: any) => ({
+            ...milestone,
+            dueDate: new Date(milestone.dueDate)
+          }))
+        }));
+        setProjects(projectsWithDates);
+      } catch (error) {
+        console.error('Failed to parse saved projects', error);
+      }
+    }
   }, []);
 
   // Save data to localStorage when it changes
@@ -147,6 +203,10 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     localStorage.setItem('studentTests', JSON.stringify(tests));
   }, [tests]);
+
+  useEffect(() => {
+    localStorage.setItem('studentProjects', JSON.stringify(projects));
+  }, [projects]);
 
   const addClass = (newClass: Omit<Class, 'id'>) => {
     const classWithId = {
@@ -174,14 +234,15 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const classToDelete = classes.find(c => c.id === classId);
     setClasses(prev => prev.filter(cls => cls.id !== classId));
     
-    // Also delete all assignments and tests for this class
+    // Also delete all assignments, tests, and projects for this class
     setAssignments(prev => prev.filter(a => a.classId !== classId));
     setTests(prev => prev.filter(t => t.classId !== classId));
+    setProjects(prev => prev.filter(p => p.classId !== classId));
     
     if (classToDelete) {
       toast({
         title: "Class deleted",
-        description: `"${classToDelete.name}" and its associated assignments and tests have been removed.`,
+        description: `"${classToDelete.name}" and its associated items have been removed.`,
       });
     }
   };
@@ -270,6 +331,65 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     ));
   };
 
+  const addProject = (project: Omit<Project, 'id'>) => {
+    const projectWithId = {
+      ...project,
+      id: crypto.randomUUID(),
+    };
+    setProjects(prev => [...prev, projectWithId]);
+    toast({
+      title: "Project added",
+      description: `"${project.title}" has been added to your projects.`,
+    });
+  };
+
+  const updateProject = (updatedProject: Project) => {
+    setProjects(prev => prev.map(project => 
+      project.id === updatedProject.id ? updatedProject : project
+    ));
+    toast({
+      title: "Project updated",
+      description: `"${updatedProject.title}" has been updated.`,
+    });
+  };
+
+  const deleteProject = (projectId: string) => {
+    const projectToDelete = projects.find(p => p.id === projectId);
+    setProjects(prev => prev.filter(project => project.id !== projectId));
+    
+    if (projectToDelete) {
+      toast({
+        title: "Project deleted",
+        description: `"${projectToDelete.title}" has been removed.`,
+      });
+    }
+  };
+
+  const toggleProjectCompletion = (projectId: string) => {
+    setProjects(prev => prev.map(project => 
+      project.id === projectId 
+        ? { ...project, completed: !project.completed } 
+        : project
+    ));
+  };
+
+  const toggleProjectMilestoneCompletion = (projectId: string, milestoneIndex: number) => {
+    setProjects(prev => prev.map(project => {
+      if (project.id !== projectId) return project;
+      
+      const updatedMilestones = [...project.milestones];
+      updatedMilestones[milestoneIndex] = {
+        ...updatedMilestones[milestoneIndex],
+        completed: !updatedMilestones[milestoneIndex].completed
+      };
+      
+      return {
+        ...project,
+        milestones: updatedMilestones
+      };
+    }));
+  };
+
   const getClassById = (classId: string) => {
     return classes.find(cls => cls.id === classId);
   };
@@ -280,6 +400,7 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         classes,
         assignments,
         tests,
+        projects,
         addClass,
         updateClass,
         deleteClass,
@@ -291,6 +412,11 @@ export const StudentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateTest,
         deleteTest,
         toggleTestCompletion,
+        addProject,
+        updateProject,
+        deleteProject,
+        toggleProjectCompletion,
+        toggleProjectMilestoneCompletion,
         getClassById,
       }}
     >

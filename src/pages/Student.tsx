@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import ClassesList from '@/components/student/ClassesList';
 import AssignmentsList from '@/components/student/AssignmentsList';
 import TestsList from '@/components/student/TestsList';
+import ProjectsList from '@/components/student/ProjectsList';
 import StudentCalendar from '@/components/student/StudentCalendar';
 import BlackboardConnect from '@/components/student/BlackboardConnect';
 import {
@@ -76,10 +77,11 @@ const StudentContent = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
           <Tabs defaultValue="classes">
-            <TabsList className="w-full grid grid-cols-4">
+            <TabsList className="w-full grid grid-cols-5">
               <TabsTrigger value="classes">Classes</TabsTrigger>
               <TabsTrigger value="assignments">Assignments</TabsTrigger>
               <TabsTrigger value="tests">Tests</TabsTrigger>
+              <TabsTrigger value="projects">Projects</TabsTrigger>
               <TabsTrigger value="calendar">Calendar</TabsTrigger>
             </TabsList>
             <TabsContent value="classes" className="mt-4">
@@ -90,6 +92,9 @@ const StudentContent = () => {
             </TabsContent>
             <TabsContent value="tests" className="mt-4">
               <TestsList />
+            </TabsContent>
+            <TabsContent value="projects" className="mt-4">
+              <ProjectsList />
             </TabsContent>
             <TabsContent value="calendar" className="mt-4">
               <StudentCalendar />
