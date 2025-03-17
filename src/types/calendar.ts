@@ -1,4 +1,3 @@
-
 export type EventType = 'reminder' | 'routine';
 
 export interface CalendarEvent {
@@ -30,8 +29,8 @@ export type ViewType = 'month' | 'week' | 'day';
 
 // Student-related types
 export type ClassPriority = 'high' | 'medium' | 'low';
-export type AssignmentType = 'homework' | 'project' | 'paper' | 'reading' | 'other';
-export type TestType = 'quiz' | 'midterm' | 'final' | 'exam' | 'other';
+export type AssignmentType = 'homework' | 'project' | 'paper' | 'reading' | 'presentation' | 'other';
+export type TestType = 'quiz' | 'midterm' | 'final' | 'exam' | 'test' | 'other';
 
 export interface Class {
   id: string;
