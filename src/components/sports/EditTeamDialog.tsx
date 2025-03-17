@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { useSports, teamColorOptions } from '@/context/SportsContext';
+import { useSports } from '@/context/SportsContext';
+import { sportColorOptions } from '@/types/sports';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -134,7 +135,7 @@ const EditTeamDialog = ({ team, isOpen, onClose }: EditTeamDialogProps) => {
           <div className="space-y-2">
             <Label>Team Color</Label>
             <div className="flex flex-wrap gap-2">
-              {teamColorOptions.map((colorOption) => (
+              {sportColorOptions.map((colorOption) => (
                 <button
                   key={colorOption.value}
                   type="button"
@@ -144,7 +145,7 @@ const EditTeamDialog = ({ team, isOpen, onClose }: EditTeamDialogProps) => {
                   )}
                   style={{ backgroundColor: colorOption.value }}
                   onClick={() => setColor(colorOption.value)}
-                  aria-label={`Select ${colorOption.label} color`}
+                  aria-label={`Select ${colorOption.name} color`}
                 ></button>
               ))}
             </div>
