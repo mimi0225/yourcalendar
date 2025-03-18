@@ -106,6 +106,18 @@ const Settings = () => {
                   onCheckedChange={() => toggleTab('budget')}
                 />
               </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Settings2 className="h-5 w-5" />
+                  <Label htmlFor="settings-tab">Settings Tab</Label>
+                </div>
+                <Switch
+                  id="settings-tab"
+                  checked={tabSettings.settings}
+                  onCheckedChange={() => toggleTab('settings')}
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
