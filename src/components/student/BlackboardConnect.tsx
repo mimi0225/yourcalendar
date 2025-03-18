@@ -46,12 +46,36 @@ const BlackboardConnect: React.FC = () => {
       return;
     }
     
-    await connectToCalendar(calendarUrl, calendarName);
-    setDialogOpen(false);
+    try {
+      await connectToCalendar(calendarUrl, calendarName);
+      setDialogOpen(false);
+      setCalendarUrl('');
+      setCalendarName('');
+    } catch (error) {
+      console.error("Connection error:", error);
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to calendar. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDisconnect = () => {
     disconnectFromCalendar();
+  };
+
+  const handleSync = async () => {
+    try {
+      await syncCalendarEvents();
+    } catch (error) {
+      console.error("Sync error:", error);
+      toast({
+        title: "Sync Error",
+        description: "Failed to sync calendar events. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -81,7 +105,7 @@ const BlackboardConnect: React.FC = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={syncCalendarEvents}
+              onClick={handleSync}
               disabled={isSyncing}
             >
               {isSyncing ? (

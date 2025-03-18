@@ -61,28 +61,42 @@ export interface Project {
   weight?: number;
 }
 
-// Add missing type definitions required by other components
-export type EventType = 'class' | 'assignment' | 'test' | 'project' | 'personal';
+// Updated EventType to match what's used in the application
+export type EventType = 'class' | 'assignment' | 'test' | 'project' | 'personal' | 'routine' | 'reminder';
 
 export interface CalendarEvent {
   id: string;
   title: string;
-  start: Date;
-  end: Date;
+  // Updated to include both start/end dates and legacy date/time fields to fix type errors
+  start?: Date;
+  end?: Date;
+  date?: Date;
+  time?: string;
   allDay?: boolean;
   type: EventType;
   description?: string;
   location?: string;
   color?: string;
+  completed?: boolean;
 }
 
 export type ViewType = 'day' | 'week' | 'month';
 
-export type CalendarTheme = 'light' | 'dark' | 'system';
+export type CalendarTheme = 'light' | 'dark' | 'system' | 'theme-lavender' | 'theme-mint' | 'theme-peach' | 'theme-rose' | 'theme-sky' | 'theme-lemon' | 'calendar-theme-pastel' | 'calendar-theme-warm' | 'calendar-theme-cool' | 'calendar-theme-bright' | 'calendar-theme-subtle';
 
 export type ThemeOption = {
   value: CalendarTheme;
   label: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
+  name?: string;
+  bgColor?: string;
+  textColor?: string;
 };
 
+// Settings related types
+export interface TabSettings {
+  student: boolean;
+  period: boolean;
+  sports: boolean;
+  settings: boolean;
+}

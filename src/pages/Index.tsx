@@ -1,5 +1,7 @@
+
 import { useCalendar, CalendarProvider } from '@/context/CalendarContext';
 import { useAuth } from '@/context/AuthContext';
+import { useSettings } from '@/context/SettingsContext';
 import CalendarHeader from '@/components/CalendarHeader';
 import MonthView from '@/components/MonthView';
 import DayView from '@/components/DayView';
@@ -8,7 +10,7 @@ import EventList from '@/components/EventList';
 import AddEventForm from '@/components/AddEventForm';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { GraduationCap, LogOut, AlertTriangle, Droplet, Trophy } from 'lucide-react';
+import { GraduationCap, LogOut, AlertTriangle, Droplet, Trophy, Settings2 } from 'lucide-react';
 import CalendarNotifications from '@/components/CalendarNotifications';
 import LoginForm from '@/components/auth/LoginForm';
 import {
@@ -26,6 +28,7 @@ import {
 const CalendarApp = () => {
   const { selectedView, activeCalendarTheme } = useCalendar();
   const { user, logout, isAuthenticated } = useAuth();
+  const { tabSettings } = useSettings();
   
   return (
     <div className={`container max-w-7xl py-4 ${activeCalendarTheme} min-h-screen flex flex-col`}>
@@ -43,24 +46,42 @@ const CalendarApp = () => {
                 <span className="font-medium">Calendar</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/student">
-                <GraduationCap className="mr-2 h-4 w-4" />
-                Student
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/period">
-                <Droplet className="mr-2 h-4 w-4" />
-                Period
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/sports">
-                <Trophy className="mr-2 h-4 w-4" />
-                Sports
-              </Link>
-            </Button>
+            
+            {tabSettings.student && (
+              <Button asChild variant="outline" size="lg">
+                <Link to="/student">
+                  <GraduationCap className="mr-2 h-4 w-4" />
+                  Student
+                </Link>
+              </Button>
+            )}
+            
+            {tabSettings.period && (
+              <Button asChild variant="outline" size="lg">
+                <Link to="/period">
+                  <Droplet className="mr-2 h-4 w-4" />
+                  Period
+                </Link>
+              </Button>
+            )}
+            
+            {tabSettings.sports && (
+              <Button asChild variant="outline" size="lg">
+                <Link to="/sports">
+                  <Trophy className="mr-2 h-4 w-4" />
+                  Sports
+                </Link>
+              </Button>
+            )}
+            
+            {tabSettings.settings && (
+              <Button asChild variant="outline" size="lg">
+                <Link to="/settings">
+                  <Settings2 className="mr-2 h-4 w-4" />
+                  Settings
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
