@@ -4,6 +4,8 @@ import Index from './pages/Index';
 import Student from './pages/Student';
 import PeriodTracker from './pages/PeriodTracker';
 import Sports from './pages/Sports';
+import Chores from './pages/Chores';
+import Budget from './pages/Budget';
 import Settings from './pages/Settings';
 import NotFound from './pages/NotFound';
 import { AuthProvider } from './context/AuthContext';
@@ -29,6 +31,8 @@ function App() {
                     <Route path="/student" element={<Student />} />
                     <Route path="/period" element={<PeriodTracker />} />
                     <Route path="/sports" element={<Sports />} />
+                    <Route path="/chores" element={<Chores />} />
+                    <Route path="/budget" element={<Budget />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

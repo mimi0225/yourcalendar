@@ -99,4 +99,6 @@ export interface TabSettings {
   period: boolean;
   sports: boolean;
   settings: boolean;
+  chores: boolean;
+  budget: boolean;
 }

@@ -11,7 +11,7 @@ import EventList from '@/components/EventList';
 import AddEventForm from '@/components/AddEventForm';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { GraduationCap, LogOut, AlertTriangle, Droplet, Trophy, Settings2 } from 'lucide-react';
+import { GraduationCap, LogOut, AlertTriangle, Droplet, Trophy, Settings2, Clipboard, DollarSign } from 'lucide-react';
 import CalendarNotifications from '@/components/CalendarNotifications';
 import LoginForm from '@/components/auth/LoginForm';
 import {
@@ -71,6 +71,24 @@ const CalendarApp = () => {
                 <Link to="/sports">
                   <Trophy className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
                   {!isMobile && <span>Sports</span>}
+                </Link>
+              </Button>
+            )}
+            
+            {tabSettings.chores && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/chores">
+                  <Clipboard className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Chores</span>}
+                </Link>
+              </Button>
+            )}
+            
+            {tabSettings.budget && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/budget">
+                  <DollarSign className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Budget</span>}
                 </Link>
               </Button>
             )}

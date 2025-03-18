@@ -5,12 +5,12 @@ import { useToast } from '@/hooks/use-toast';
 
 // Available theme options
 export const themeOptions: ThemeOption[] = [
-  { name: 'Lavender', value: 'theme-lavender', bgColor: '#9b87f5', textColor: 'white' },
-  { name: 'Mint', value: 'theme-mint', bgColor: '#8BE8CB', textColor: 'black' },
-  { name: 'Peach', value: 'theme-peach', bgColor: '#FEC6A1', textColor: 'black' },
-  { name: 'Rose', value: 'theme-rose', bgColor: '#FFDEE2', textColor: 'black' },
-  { name: 'Sky', value: 'theme-sky', bgColor: '#D3E4FD', textColor: 'black' },
-  { name: 'Lemon', value: 'theme-lemon', bgColor: '#FEF7CD', textColor: 'black' },
+  { name: 'Lavender', label: 'Lavender', value: 'theme-lavender', bgColor: '#9b87f5', textColor: 'white' },
+  { name: 'Mint', label: 'Mint', value: 'theme-mint', bgColor: '#8BE8CB', textColor: 'black' },
+  { name: 'Peach', label: 'Peach', value: 'theme-peach', bgColor: '#FEC6A1', textColor: 'black' },
+  { name: 'Rose', label: 'Rose', value: 'theme-rose', bgColor: '#FFDEE2', textColor: 'black' },
+  { name: 'Sky', label: 'Sky', value: 'theme-sky', bgColor: '#D3E4FD', textColor: 'black' },
+  { name: 'Lemon', label: 'Lemon', value: 'theme-lemon', bgColor: '#FEF7CD', textColor: 'black' },
 ];
 
 // Available calendar theme options

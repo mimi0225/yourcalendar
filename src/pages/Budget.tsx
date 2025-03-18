@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { PeriodProvider } from '@/context/PeriodContext';
-import PeriodTracker from '@/components/period/PeriodTracker';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign } from 'lucide-react';
@@ -20,8 +18,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-const PeriodTrackerPage: React.FC = () => {
+const Budget: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { tabSettings } = useSettings();
@@ -31,9 +30,9 @@ const PeriodTrackerPage: React.FC = () => {
       <div className="flex flex-col mb-6">
         <div className="flex justify-between items-center">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold">Period Tracker</h1>
+            <h1 className="text-3xl font-bold">Budget Management</h1>
             <p className="text-muted-foreground">
-              Track and manage your cycle
+              Track your finances and manage your budget
             </p>
           </div>
         </div>
@@ -57,12 +56,14 @@ const PeriodTrackerPage: React.FC = () => {
               </Button>
             )}
             
-            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
-              <Link to="/period">
-                <Droplet className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
-                {!isMobile && <span>Period</span>}
-              </Link>
-            </Button>
+            {tabSettings.period && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/period">
+                  <Droplet className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Period</span>}
+                </Link>
+              </Button>
+            )}
             
             {tabSettings.sports && (
               <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
@@ -82,14 +83,12 @@ const PeriodTrackerPage: React.FC = () => {
               </Button>
             )}
             
-            {tabSettings.budget && (
-              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
-                <Link to="/budget">
-                  <DollarSign className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
-                  {!isMobile && <span>Budget</span>}
-                </Link>
-              </Button>
-            )}
+            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+              <Link to="/budget">
+                <DollarSign className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                {!isMobile && <span>Budget</span>}
+              </Link>
+            </Button>
             
             {tabSettings.settings && (
               <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
@@ -109,7 +108,20 @@ const PeriodTrackerPage: React.FC = () => {
         </div>
       ) : (
         <div className="flex-grow">
-          <PeriodTracker />
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Budget Management</CardTitle>
+              <CardDescription>
+                This is a placeholder for the budget management functionality.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>
+                The budget management tool will help you track expenses, monitor income,
+                create budgets, set financial goals, and visualize your financial progress.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       )}
       
@@ -153,12 +165,4 @@ const PeriodTrackerPage: React.FC = () => {
   );
 };
 
-const PeriodTrackerWithProvider: React.FC = () => {
-  return (
-    <PeriodProvider>
-      <PeriodTrackerPage />
-    </PeriodProvider>
-  );
-};
-
-export default PeriodTrackerWithProvider;
+export default Budget;

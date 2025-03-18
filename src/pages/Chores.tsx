@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { PeriodProvider } from '@/context/PeriodContext';
-import PeriodTracker from '@/components/period/PeriodTracker';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign } from 'lucide-react';
@@ -20,8 +18,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-const PeriodTrackerPage: React.FC = () => {
+const Chores: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { tabSettings } = useSettings();
@@ -31,9 +30,9 @@ const PeriodTrackerPage: React.FC = () => {
       <div className="flex flex-col mb-6">
         <div className="flex justify-between items-center">
           <div className="space-y-1">
-            <h1 className="text-3xl font-bold">Period Tracker</h1>
+            <h1 className="text-3xl font-bold">Chores Tracker</h1>
             <p className="text-muted-foreground">
-              Track and manage your cycle
+              Manage and track your household tasks
             </p>
           </div>
         </div>
@@ -57,12 +56,14 @@ const PeriodTrackerPage: React.FC = () => {
               </Button>
             )}
             
-            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
-              <Link to="/period">
-                <Droplet className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
-                {!isMobile && <span>Period</span>}
-              </Link>
-            </Button>
+            {tabSettings.period && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/period">
+                  <Droplet className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Period</span>}
+                </Link>
+              </Button>
+            )}
             
             {tabSettings.sports && (
               <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
@@ -73,14 +74,12 @@ const PeriodTrackerPage: React.FC = () => {
               </Button>
             )}
             
-            {tabSettings.chores && (
-              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
-                <Link to="/chores">
-                  <Clipboard className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
-                  {!isMobile && <span>Chores</span>}
-                </Link>
-              </Button>
-            )}
+            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+              <Link to="/chores">
+                <Clipboard className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                {!isMobile && <span>Chores</span>}
+              </Link>
+            </Button>
             
             {tabSettings.budget && (
               <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
@@ -109,7 +108,20 @@ const PeriodTrackerPage: React.FC = () => {
         </div>
       ) : (
         <div className="flex-grow">
-          <PeriodTracker />
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Chores Tracker</CardTitle>
+              <CardDescription>
+                This is a placeholder for the chores tracker functionality.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>
+                The chores tracker will allow you to create and manage household tasks,
+                set schedules, assign responsibilities, and track completion status.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       )}
       
@@ -153,12 +165,4 @@ const PeriodTrackerPage: React.FC = () => {
   );
 };
 
-const PeriodTrackerWithProvider: React.FC = () => {
-  return (
-    <PeriodProvider>
-      <PeriodTrackerPage />
-    </PeriodProvider>
-  );
-};
-
-export default PeriodTrackerWithProvider;
+export default Chores;

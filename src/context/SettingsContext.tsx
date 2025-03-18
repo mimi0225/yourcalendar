@@ -14,7 +14,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     student: true,
     period: true,
     sports: true,
-    settings: true
+    settings: true,
+    chores: true,
+    budget: true
   });
 
   // Load saved settings from localStorage when component mounts

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useCalendar, themeOptions, calendarThemeOptions } from '@/context/CalendarContext';
+import { useCalendar } from '@/context/CalendarContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { GraduationCap, Droplet, Trophy, Settings2 } from 'lucide-react';
+import { GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Settings = () => {
@@ -80,6 +80,30 @@ const Settings = () => {
                   id="sports-tab"
                   checked={tabSettings.sports}
                   onCheckedChange={() => toggleTab('sports')}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Clipboard className="h-5 w-5" />
+                  <Label htmlFor="chores-tab">Chores Tab</Label>
+                </div>
+                <Switch
+                  id="chores-tab"
+                  checked={tabSettings.chores}
+                  onCheckedChange={() => toggleTab('chores')}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <DollarSign className="h-5 w-5" />
+                  <Label htmlFor="budget-tab">Budget Tab</Label>
+                </div>
+                <Switch
+                  id="budget-tab"
+                  checked={tabSettings.budget}
+                  onCheckedChange={() => toggleTab('budget')}
                 />
               </div>
             </CardContent>
