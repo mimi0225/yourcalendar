@@ -60,3 +60,29 @@ export interface Project {
   completed: boolean;
   weight?: number;
 }
+
+// Add missing type definitions required by other components
+export type EventType = 'class' | 'assignment' | 'test' | 'project' | 'personal';
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  allDay?: boolean;
+  type: EventType;
+  description?: string;
+  location?: string;
+  color?: string;
+}
+
+export type ViewType = 'day' | 'week' | 'month';
+
+export type CalendarTheme = 'light' | 'dark' | 'system';
+
+export type ThemeOption = {
+  value: CalendarTheme;
+  label: string;
+  icon: React.ReactNode;
+};
+

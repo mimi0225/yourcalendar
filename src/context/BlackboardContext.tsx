@@ -4,28 +4,27 @@ import { useToast } from '@/hooks/use-toast';
 import { useStudent } from './StudentContext';
 import { Assignment, Test, Project } from '@/types/calendar';
 
-interface BlackboardUser {
+interface CalendarConnection {
   id: string;
-  username: string;
-  email: string;
-  institution: string;
+  url: string;
+  name: string;
   isConnected: boolean;
 }
 
 interface BlackboardContextType {
-  blackboardUser: BlackboardUser | null;
+  calendarConnection: CalendarConnection | null;
   isConnecting: boolean;
   lastSynced: Date | null;
-  connectToBlackboard: (username: string, password: string, institution: string) => Promise<void>;
-  disconnectFromBlackboard: () => void;
-  syncAssignments: () => Promise<void>;
+  connectToCalendar: (url: string, name: string) => Promise<void>;
+  disconnectFromCalendar: () => void;
+  syncCalendarEvents: () => Promise<void>;
   isSyncing: boolean;
 }
 
 const BlackboardContext = createContext<BlackboardContextType | undefined>(undefined);
 
 export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [blackboardUser, setBlackboardUser] = useState<BlackboardUser | null>(null);
+  const [calendarConnection, setCalendarConnection] = useState<CalendarConnection | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSynced, setLastSynced] = useState<Date | null>(null);
@@ -34,16 +33,16 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   // Load saved connection from localStorage
   useEffect(() => {
-    const savedUser = localStorage.getItem('blackboardUser');
-    if (savedUser) {
+    const savedConnection = localStorage.getItem('calendarConnection');
+    if (savedConnection) {
       try {
-        setBlackboardUser(JSON.parse(savedUser));
+        setCalendarConnection(JSON.parse(savedConnection));
       } catch (error) {
-        console.error('Failed to parse saved Blackboard user', error);
+        console.error('Failed to parse saved calendar connection', error);
       }
     }
 
-    const savedLastSynced = localStorage.getItem('blackboardLastSynced');
+    const savedLastSynced = localStorage.getItem('calendarLastSynced');
     if (savedLastSynced) {
       try {
         setLastSynced(new Date(JSON.parse(savedLastSynced)));
@@ -55,49 +54,48 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   // Save connection to localStorage when it changes
   useEffect(() => {
-    if (blackboardUser) {
-      localStorage.setItem('blackboardUser', JSON.stringify(blackboardUser));
+    if (calendarConnection) {
+      localStorage.setItem('calendarConnection', JSON.stringify(calendarConnection));
     } else {
-      localStorage.removeItem('blackboardUser');
+      localStorage.removeItem('calendarConnection');
     }
-  }, [blackboardUser]);
+  }, [calendarConnection]);
 
   // Save last synced date to localStorage
   useEffect(() => {
     if (lastSynced) {
-      localStorage.setItem('blackboardLastSynced', JSON.stringify(lastSynced.toISOString()));
+      localStorage.setItem('calendarLastSynced', JSON.stringify(lastSynced.toISOString()));
     }
   }, [lastSynced]);
 
-  const connectToBlackboard = async (username: string, password: string, institution: string) => {
+  const connectToCalendar = async (url: string, name: string) => {
     setIsConnecting(true);
     
     try {
-      // In a real implementation, this would make an API call to authenticate with Blackboard
+      // In a real implementation, this would validate the calendar URL and fetch data
       // For demo purposes, we're simulating a successful connection
       await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
       
-      const newUser: BlackboardUser = {
+      const newConnection: CalendarConnection = {
         id: crypto.randomUUID(),
-        username,
-        email: `${username}@${institution.toLowerCase().replace(/\s+/g, '')}.edu`,
-        institution,
+        url,
+        name: name || 'My Calendar',
         isConnected: true
       };
       
-      setBlackboardUser(newUser);
+      setCalendarConnection(newConnection);
       toast({
-        title: "Connected to Blackboard",
-        description: `Successfully connected to ${institution} Blackboard as ${username}`,
+        title: "Connected to Calendar",
+        description: `Successfully connected to ${name || 'calendar'}`,
       });
       
-      // After connecting, automatically sync assignments
-      await syncAssignments();
+      // After connecting, automatically sync events
+      await syncCalendarEvents();
     } catch (error) {
-      console.error('Failed to connect to Blackboard', error);
+      console.error('Failed to connect to calendar', error);
       toast({
         title: "Connection Failed",
-        description: "Could not connect to Blackboard. Please check your credentials and try again.",
+        description: "Could not connect to the calendar. Please check the URL and try again.",
         variant: "destructive",
       });
     } finally {
@@ -105,19 +103,19 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  const disconnectFromBlackboard = () => {
-    setBlackboardUser(null);
+  const disconnectFromCalendar = () => {
+    setCalendarConnection(null);
     toast({
-      title: "Disconnected from Blackboard",
-      description: "Your Blackboard account has been disconnected.",
+      title: "Disconnected from Calendar",
+      description: "Your calendar has been disconnected.",
     });
   };
 
-  const syncAssignments = async () => {
-    if (!blackboardUser) {
+  const syncCalendarEvents = async () => {
+    if (!calendarConnection) {
       toast({
         title: "Not Connected",
-        description: "Please connect to Blackboard before syncing assignments.",
+        description: "Please connect to a calendar before syncing events.",
         variant: "destructive",
       });
       return;
@@ -126,14 +124,14 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setIsSyncing(true);
     
     try {
-      // In a real implementation, this would make an API call to fetch assignments from Blackboard
-      // For demo purposes, we're simulating fetching and adding assignments
+      // In a real implementation, this would fetch and parse the calendar feed
+      // For demo purposes, we're simulating fetching and adding events
       await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
       
-      // Generate some sample assignments based on the user's institution
-      const sampleAssignments = generateSampleAssignments(blackboardUser.institution);
-      const sampleTests = generateSampleTests(blackboardUser.institution);
-      const sampleProjects = generateSampleProjects(blackboardUser.institution);
+      // Generate some sample assignments, tests, and projects based on the calendar name
+      const sampleAssignments = generateSampleAssignments(calendarConnection.name);
+      const sampleTests = generateSampleTests(calendarConnection.name);
+      const sampleProjects = generateSampleProjects(calendarConnection.name);
       
       // Add the assignments to the student context
       sampleAssignments.forEach(assignment => {
@@ -153,13 +151,13 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setLastSynced(new Date());
       toast({
         title: "Sync Complete",
-        description: `Added ${sampleAssignments.length} assignments, ${sampleTests.length} tests, and ${sampleProjects.length} projects from Blackboard.`,
+        description: `Added ${sampleAssignments.length} assignments, ${sampleTests.length} tests, and ${sampleProjects.length} projects from calendar.`,
       });
     } catch (error) {
-      console.error('Failed to sync from Blackboard', error);
+      console.error('Failed to sync from calendar', error);
       toast({
         title: "Sync Failed",
-        description: "Could not sync from Blackboard. Please try again later.",
+        description: "Could not sync from calendar. Please check the URL and try again later.",
         variant: "destructive",
       });
     } finally {
@@ -170,12 +168,12 @@ export const BlackboardProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   return (
     <BlackboardContext.Provider
       value={{
-        blackboardUser,
+        calendarConnection,
         isConnecting,
         lastSynced,
-        connectToBlackboard,
-        disconnectFromBlackboard,
-        syncAssignments,
+        connectToCalendar,
+        disconnectFromCalendar,
+        syncCalendarEvents,
         isSyncing,
       }}
     >
@@ -192,8 +190,8 @@ export const useBlackboard = () => {
   return context;
 };
 
-// Helper functions to generate sample data
-const generateSampleAssignments = (institution: string): Omit<Assignment, 'id'>[] => {
+// Helper functions to generate sample data (these remain mostly the same)
+const generateSampleAssignments = (calendarName: string): Omit<Assignment, 'id'>[] => {
   const classes = ['CS101', 'MATH201', 'BIO110', 'HIST300', 'ECON250'];
   const assignmentTypes: Assignment['type'][] = ['homework', 'paper', 'presentation'];
   
@@ -204,14 +202,14 @@ const generateSampleAssignments = (institution: string): Omit<Assignment, 'id'>[
       classId: crypto.randomUUID(), // In a real app, this would map to an actual class ID
       dueDate: new Date(Date.now() + (Math.floor(Math.random() * 14) + 1) * 24 * 60 * 60 * 1000), // Random due date in the next 14 days
       type: assignmentTypes[Math.floor(Math.random() * assignmentTypes.length)],
-      description: `Assignment from ${institution} Blackboard`,
+      description: `Assignment from ${calendarName}`,
       completed: false,
       weight: Math.floor(Math.random() * 15) + 5, // Random weight between 5-20%
     };
   });
 };
 
-const generateSampleTests = (institution: string): Omit<Test, 'id'>[] => {
+const generateSampleTests = (calendarName: string): Omit<Test, 'id'>[] => {
   const classes = ['CS101', 'MATH201', 'BIO110', 'HIST300', 'ECON250'];
   const testTypes: Test['type'][] = ['quiz', 'midterm', 'final', 'test'];
   
@@ -230,7 +228,7 @@ const generateSampleTests = (institution: string): Omit<Test, 'id'>[] => {
   });
 };
 
-const generateSampleProjects = (institution: string): Omit<Project, 'id'>[] => {
+const generateSampleProjects = (calendarName: string): Omit<Project, 'id'>[] => {
   const classes = ['CS101', 'MATH201', 'BIO110', 'HIST300', 'ECON250'];
   const projectTypes: Project['type'][] = ['individual', 'group', 'research'];
   
@@ -243,7 +241,7 @@ const generateSampleProjects = (institution: string): Omit<Project, 'id'>[] => {
       classId: crypto.randomUUID(),
       dueDate: new Date(Date.now() + (Math.floor(Math.random() * 30) + 10) * 24 * 60 * 60 * 1000), // Random due date in the next 10-40 days
       type: projectTypes[Math.floor(Math.random() * projectTypes.length)],
-      description: `Project from ${institution} Blackboard`,
+      description: `Project from ${calendarName}`,
       teamMembers: hasTeamMembers ? ['Student 1', 'Student 2', 'Student 3'].slice(0, Math.floor(Math.random() * 3) + 1) : [],
       milestones: [
         { 
