@@ -1,7 +1,9 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { SportsProvider, useSports } from '@/context/SportsContext';
 import { useAuth } from '@/context/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useSettings } from '@/context/SettingsContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SportsCalendar from '@/components/sports/SportsCalendar';
 import TeamsList from '@/components/sports/TeamsList';
@@ -11,7 +13,7 @@ import AddEventForm from '@/components/sports/AddEventForm';
 import LoginForm from '@/components/auth/LoginForm';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Calendar, GraduationCap, Trophy, LayoutGrid, LogOut, AlertTriangle, Droplet } from 'lucide-react';
+import { Calendar, GraduationCap, Trophy, LayoutGrid, LogOut, AlertTriangle, Droplet, Settings2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +29,8 @@ import {
 const SportsPage = () => {
   const { teams } = useSports();
   const { user, logout, isAuthenticated } = useAuth();
+  const isMobile = useIsMobile();
+  const { tabSettings } = useSettings();
   
   return (
     <div className="container max-w-7xl py-4 min-h-screen flex flex-col">
@@ -40,33 +44,49 @@ const SportsPage = () => {
           </div>
         </div>
         
-        {/* Navigation tabs below header */}
+        {/* Mobile-optimized navigation tabs */}
         <div className="flex justify-center mt-4">
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="lg">
+          <div className={`flex ${isMobile ? 'flex-wrap gap-2 justify-center' : 'gap-2'}`}>
+            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
               <Link to="/">
-                <Calendar className="mr-2 h-4 w-4" />
-                Calendar
+                <Calendar className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                {!isMobile && <span>Calendar</span>}
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/student">
-                <GraduationCap className="mr-2 h-4 w-4" />
-                Student
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/period">
-                <Droplet className="mr-2 h-4 w-4" />
-                Period
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
+            
+            {tabSettings.student && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/student">
+                  <GraduationCap className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Student</span>}
+                </Link>
+              </Button>
+            )}
+            
+            {tabSettings.period && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/period">
+                  <Droplet className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Period</span>}
+                </Link>
+              </Button>
+            )}
+            
+            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
               <Link to="/sports">
-                <Trophy className="mr-2 h-4 w-4" />
-                <span className="font-medium">Sports</span>
+                <Trophy className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                {!isMobile && <span>Sports</span>}
               </Link>
             </Button>
+            
+            {tabSettings.settings && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/settings">
+                  <Settings2 className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Settings</span>}
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -78,7 +98,7 @@ const SportsPage = () => {
       ) : (
         <>
           <Tabs defaultValue="overview" className="flex-grow">
-            <TabsList className="mb-6 flex justify-center">
+            <TabsList className={`mb-6 flex ${isMobile ? 'flex-wrap' : 'justify-center'}`}>
               <TabsTrigger value="overview">
                 <LayoutGrid className="mr-1 h-4 w-4" />
                 Overview

@@ -2,6 +2,7 @@
 import { useCalendar, CalendarProvider } from '@/context/CalendarContext';
 import { useAuth } from '@/context/AuthContext';
 import { useSettings } from '@/context/SettingsContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 import CalendarHeader from '@/components/CalendarHeader';
 import MonthView from '@/components/MonthView';
 import DayView from '@/components/DayView';
@@ -29,56 +30,56 @@ const CalendarApp = () => {
   const { selectedView, activeCalendarTheme } = useCalendar();
   const { user, logout, isAuthenticated } = useAuth();
   const { tabSettings } = useSettings();
+  const isMobile = useIsMobile();
   
   return (
     <div className={`container max-w-7xl py-4 ${activeCalendarTheme} min-h-screen flex flex-col`}>
       <div className="flex flex-col mb-4">
         <div className="flex justify-between items-center">
           <CalendarHeader />
-          {/* Removed user info from here */}
         </div>
         
-        {/* Navigation tabs below month selection */}
+        {/* Mobile-optimized navigation tabs */}
         <div className="flex justify-center mt-4">
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="lg">
+          <div className={`flex ${isMobile ? 'flex-wrap gap-2 justify-center' : 'gap-2'}`}>
+            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
               <Link to="/">
                 <span className="font-medium">Calendar</span>
               </Link>
             </Button>
             
             {tabSettings.student && (
-              <Button asChild variant="outline" size="lg">
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
                 <Link to="/student">
-                  <GraduationCap className="mr-2 h-4 w-4" />
-                  Student
+                  <GraduationCap className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Student</span>}
                 </Link>
               </Button>
             )}
             
             {tabSettings.period && (
-              <Button asChild variant="outline" size="lg">
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
                 <Link to="/period">
-                  <Droplet className="mr-2 h-4 w-4" />
-                  Period
+                  <Droplet className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Period</span>}
                 </Link>
               </Button>
             )}
             
             {tabSettings.sports && (
-              <Button asChild variant="outline" size="lg">
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
                 <Link to="/sports">
-                  <Trophy className="mr-2 h-4 w-4" />
-                  Sports
+                  <Trophy className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Sports</span>}
                 </Link>
               </Button>
             )}
             
             {tabSettings.settings && (
-              <Button asChild variant="outline" size="lg">
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
                 <Link to="/settings">
-                  <Settings2 className="mr-2 h-4 w-4" />
-                  Settings
+                  <Settings2 className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Settings</span>}
                 </Link>
               </Button>
             )}

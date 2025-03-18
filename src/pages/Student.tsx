@@ -3,8 +3,10 @@ import { StudentProvider } from '@/context/StudentContext';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Link } from 'react-router-dom';
-import { GraduationCap, LogOut, AlertTriangle, Droplet, Trophy, Calendar } from 'lucide-react';
+import { GraduationCap, LogOut, AlertTriangle, Droplet, Trophy, Calendar, Settings2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useSettings } from '@/context/SettingsContext';
 import ClassesList from '@/components/student/ClassesList';
 import AssignmentsList from '@/components/student/AssignmentsList';
 import TestsList from '@/components/student/TestsList';
@@ -25,6 +27,8 @@ import {
 
 const StudentContent = () => {
   const { user, logout, isAuthenticated } = useAuth();
+  const isMobile = useIsMobile();
+  const { tabSettings } = useSettings();
 
   if (!isAuthenticated) {
     return (
@@ -43,33 +47,48 @@ const StudentContent = () => {
       <div className="mb-4">
         <h1 className="text-3xl font-bold">Student Dashboard</h1>
         
-        {/* Navigation tabs below title */}
+        {/* Mobile-optimized navigation tabs */}
         <div className="flex justify-center mt-4">
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="lg">
+          <div className={`flex ${isMobile ? 'flex-wrap gap-2 justify-center' : 'gap-2'}`}>
+            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
               <Link to="/">
-                <Calendar className="mr-2 h-4 w-4" />
-                Calendar
+                <Calendar className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                {!isMobile && <span>Calendar</span>}
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
+            <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
               <Link to="/student">
-                <GraduationCap className="mr-2 h-4 w-4" />
-                Student
+                <GraduationCap className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                {!isMobile && <span>Student</span>}
               </Link>
             </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/period">
-                <Droplet className="mr-2 h-4 w-4" />
-                Period
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link to="/sports">
-                <Trophy className="mr-2 h-4 w-4" />
-                Sports
-              </Link>
-            </Button>
+            
+            {tabSettings.period && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/period">
+                  <Droplet className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Period</span>}
+                </Link>
+              </Button>
+            )}
+            
+            {tabSettings.sports && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/sports">
+                  <Trophy className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Sports</span>}
+                </Link>
+              </Button>
+            )}
+            
+            {tabSettings.settings && (
+              <Button asChild variant="outline" size={isMobile ? "sm" : "lg"} className="mb-1">
+                <Link to="/settings">
+                  <Settings2 className={`${isMobile ? '' : 'mr-2'} h-4 w-4`} />
+                  {!isMobile && <span>Settings</span>}
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -77,7 +96,7 @@ const StudentContent = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
           <Tabs defaultValue="classes">
-            <TabsList className="w-full grid grid-cols-5">
+            <TabsList className={`w-full ${isMobile ? 'flex flex-wrap' : 'grid grid-cols-5'}`}>
               <TabsTrigger value="classes">Classes</TabsTrigger>
               <TabsTrigger value="assignments">Assignments</TabsTrigger>
               <TabsTrigger value="tests">Tests</TabsTrigger>
