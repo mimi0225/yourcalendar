@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, DollarSign } from 'lucide-react';
+import { Calendar as CalendarIcon, DollarSign, FileImage, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -22,12 +22,14 @@ const formSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   date: z.date(),
   type: z.enum(['income', 'expense']),
+  receiptImage: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 const AddTransactionForm: React.FC = () => {
   const { addTransaction, categories } = useBudget();
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -37,6 +39,7 @@ const AddTransactionForm: React.FC = () => {
       category: categories.length > 0 ? categories[0].id : '',
       date: new Date(),
       type: 'expense',
+      receiptImage: '',
     },
   });
 
@@ -48,11 +51,35 @@ const AddTransactionForm: React.FC = () => {
       ...data,
       amount: adjustedAmount,
     });
+    
+    // Reset form
     form.reset({
       ...form.getValues(),
       description: '',
       amount: 0,
+      receiptImage: '',
     });
+    
+    // Clear image preview
+    setPreviewImage(null);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setPreviewImage(base64String);
+        form.setValue('receiptImage', base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setPreviewImage(null);
+    form.setValue('receiptImage', '');
   };
 
   return (
@@ -190,6 +217,55 @@ const AddTransactionForm: React.FC = () => {
                 </FormItem>
               )}
             />
+            
+            <FormItem>
+              <FormLabel>Receipt Image (Optional)</FormLabel>
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center gap-2">
+                  <FormControl>
+                    <Input 
+                      type="file"
+                      accept="image/*"
+                      id="receiptImage"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </FormControl>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('receiptImage')?.click()}
+                    className="w-full"
+                  >
+                    <FileImage className="mr-2 h-4 w-4" />
+                    {previewImage ? 'Change Image' : 'Upload Receipt'}
+                  </Button>
+                  
+                  {previewImage && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={clearImage}
+                      className="px-2"
+                    >
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Remove</span>
+                    </Button>
+                  )}
+                </div>
+                
+                {previewImage && (
+                  <div className="mt-2 rounded-md border overflow-hidden relative">
+                    <img 
+                      src={previewImage} 
+                      alt="Receipt preview" 
+                      className="max-h-[200px] mx-auto object-contain"
+                    />
+                  </div>
+                )}
+              </div>
+            </FormItem>
             
             <Button type="submit" className="w-full">Add Transaction</Button>
           </form>

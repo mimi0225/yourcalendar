@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { Receipt, Pencil, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import { Receipt, Pencil, Trash2, ArrowUp, ArrowDown, FileImage } from 'lucide-react';
 import { Transaction } from '@/types/budget';
 import { useBudget } from '@/context/BudgetContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,12 +15,21 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from '@/components/ui/dialog';
 import EditTransactionDialog from './EditTransactionDialog';
 
 const TransactionsList = () => {
   const { transactions, categories, deleteTransaction } = useBudget();
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleEdit = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
@@ -34,6 +43,10 @@ const TransactionsList = () => {
   const getCategoryName = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
     return category ? category.name : 'Uncategorized';
+  };
+
+  const openImagePreview = (imageUrl: string) => {
+    setPreviewImage(imageUrl);
   };
 
   return (
@@ -59,6 +72,7 @@ const TransactionsList = () => {
                   <TableHead className="hidden md:table-cell">Category</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
                   <TableHead className="hidden md:table-cell">Date</TableHead>
+                  <TableHead className="text-center">Receipt</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -89,6 +103,20 @@ const TransactionsList = () => {
                         ${Math.abs(transaction.amount).toFixed(2)}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">{format(transaction.date, 'MMM d, yyyy')}</TableCell>
+                      <TableCell className="text-center">
+                        {transaction.receiptImage ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openImagePreview(transaction.receiptImage!)}
+                          >
+                            <FileImage className="h-4 w-4 text-blue-500" />
+                            <span className="sr-only">View Receipt</span>
+                          </Button>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
@@ -116,6 +144,29 @@ const TransactionsList = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Receipt Image Preview Dialog */}
+      <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Receipt Image</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center p-2">
+            {previewImage && (
+              <img 
+                src={previewImage} 
+                alt="Receipt" 
+                className="max-h-[70vh] object-contain rounded-md" 
+              />
+            )}
+          </div>
+          <DialogClose asChild>
+            <Button type="button" variant="secondary" className="w-full">
+              Close
+            </Button>
+          </DialogClose>
+        </DialogContent>
+      </Dialog>
 
       {selectedTransaction && (
         <EditTransactionDialog 

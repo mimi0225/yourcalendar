@@ -8,6 +8,7 @@ export const TransactionSchema = z.object({
   category: z.string(),
   date: z.date(),
   type: z.enum(["income", "expense"]),
+  receiptImage: z.string().optional(), // Receipt image URI/URL (optional)
 });
 
 export type Transaction = z.infer<typeof TransactionSchema>;
@@ -39,6 +40,7 @@ export const SavingsTransactionSchema = z.object({
   amount: z.number(),
   date: z.date(),
   type: z.enum(["deposit", "withdrawal"]),
+  receiptImage: z.string().optional(), // Receipt image URI/URL (optional)
 });
 
 export type SavingsTransaction = z.infer<typeof SavingsTransactionSchema>;
