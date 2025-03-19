@@ -18,7 +18,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import AddChoreForm from '@/components/chores/AddChoreForm';
+import ChoresList from '@/components/chores/ChoresList';
 
 const Chores: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -107,21 +108,13 @@ const Chores: React.FC = () => {
           <LoginForm />
         </div>
       ) : (
-        <div className="flex-grow">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Chores Tracker</CardTitle>
-              <CardDescription>
-                This is a placeholder for the chores tracker functionality.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>
-                The chores tracker will allow you to create and manage household tasks,
-                set schedules, assign responsibilities, and track completion status.
-              </p>
-            </CardContent>
-          </Card>
+        <div className="flex-grow grid gap-6 md:grid-cols-3">
+          <div className="md:col-span-1">
+            <AddChoreForm />
+          </div>
+          <div className="md:col-span-2">
+            <ChoresList />
+          </div>
         </div>
       )}
       

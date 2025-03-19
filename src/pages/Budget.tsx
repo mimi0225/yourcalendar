@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign } from 'lucide-react';
+import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign, Receipt } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSettings } from '@/context/SettingsContext';
@@ -18,12 +18,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BudgetSummary from '@/components/budget/BudgetSummary';
+import AddTransactionForm from '@/components/budget/AddTransactionForm';
+import TransactionsList from '@/components/budget/TransactionsList';
+import AddCategoryForm from '@/components/budget/AddCategoryForm';
 
 const Budget: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { tabSettings } = useSettings();
+  const [activeTab, setActiveTab] = useState("overview");
   
   return (
     <div className="container max-w-7xl py-4 min-h-screen flex flex-col">
@@ -108,20 +113,36 @@ const Budget: React.FC = () => {
         </div>
       ) : (
         <div className="flex-grow">
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Budget Management</CardTitle>
-              <CardDescription>
-                This is a placeholder for the budget management functionality.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>
-                The budget management tool will help you track expenses, monitor income,
-                create budgets, set financial goals, and visualize your financial progress.
-              </p>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="transactions">Transactions</TabsTrigger>
+              <TabsTrigger value="categories">Categories</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview" className="space-y-6 mt-4">
+              <BudgetSummary />
+            </TabsContent>
+            
+            <TabsContent value="transactions" className="space-y-6 mt-4">
+              <div className="grid gap-6 md:grid-cols-3">
+                <div className="md:col-span-1">
+                  <AddTransactionForm />
+                </div>
+                <div className="md:col-span-2">
+                  <TransactionsList />
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="categories" className="space-y-6 mt-4">
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <AddCategoryForm />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
       
