@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign, Receipt } from 'lucide-react';
+import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign, Receipt, PiggyBank } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSettings } from '@/context/SettingsContext';
@@ -23,6 +23,8 @@ import BudgetSummary from '@/components/budget/BudgetSummary';
 import AddTransactionForm from '@/components/budget/AddTransactionForm';
 import TransactionsList from '@/components/budget/TransactionsList';
 import AddCategoryForm from '@/components/budget/AddCategoryForm';
+import AddSavingsAccountForm from '@/components/budget/AddSavingsAccountForm';
+import SavingsAccountsList from '@/components/budget/SavingsAccountsList';
 
 const Budget: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -114,9 +116,10 @@ const Budget: React.FC = () => {
       ) : (
         <div className="flex-grow">
           <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="transactions">Transactions</TabsTrigger>
+              <TabsTrigger value="savings">Savings</TabsTrigger>
               <TabsTrigger value="categories">Categories</TabsTrigger>
             </TabsList>
             
@@ -131,6 +134,17 @@ const Budget: React.FC = () => {
                 </div>
                 <div className="md:col-span-2">
                   <TransactionsList />
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="savings" className="space-y-6 mt-4">
+              <div className="grid gap-6 md:grid-cols-3">
+                <div className="md:col-span-1">
+                  <AddSavingsAccountForm />
+                </div>
+                <div className="md:col-span-2">
+                  <SavingsAccountsList />
                 </div>
               </div>
             </TabsContent>
