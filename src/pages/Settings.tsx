@@ -1,26 +1,15 @@
 
 import React from 'react';
-import { useCalendar } from '@/context/CalendarContext';
 import { useSettings } from '@/context/SettingsContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Settings = () => {
-  const { 
-    activeTheme, 
-    setActiveTheme, 
-    activeCalendarTheme, 
-    setActiveCalendarTheme,
-    themeOptions,
-    calendarThemeOptions 
-  } = useCalendar();
-  
   const { tabSettings, toggleTab } = useSettings();
 
   return (
@@ -33,9 +22,8 @@ const Settings = () => {
       </div>
 
       <Tabs defaultValue="tabs" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-1">
           <TabsTrigger value="tabs">Tab Visibility</TabsTrigger>
-          <TabsTrigger value="themes">Theme Settings</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tabs" className="space-y-4">
@@ -117,74 +105,6 @@ const Settings = () => {
                   checked={tabSettings.settings}
                   onCheckedChange={() => toggleTab('settings')}
                 />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="themes" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Color Customization</CardTitle>
-              <CardDescription>
-                Customize the appearance of your calendar
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="theme">Accent Theme</Label>
-                <Select
-                  value={activeTheme}
-                  onValueChange={setActiveTheme}
-                >
-                  <SelectTrigger id="theme">
-                    <SelectValue placeholder="Select a theme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {themeOptions.map((theme) => (
-                      <SelectItem 
-                        key={theme.value} 
-                        value={theme.value}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div 
-                            className="w-4 h-4 rounded-full" 
-                            style={{ backgroundColor: theme.bgColor }}
-                          />
-                          {theme.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="calendar-theme">Calendar Theme</Label>
-                <Select
-                  value={activeCalendarTheme}
-                  onValueChange={setActiveCalendarTheme}
-                >
-                  <SelectTrigger id="calendar-theme">
-                    <SelectValue placeholder="Select a calendar theme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {calendarThemeOptions.map((theme) => (
-                      <SelectItem 
-                        key={theme.value} 
-                        value={theme.value}
-                      >
-                        {theme.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2 pt-4">
-                <p className="text-sm text-muted-foreground">
-                  Your theme preferences are automatically saved and will be applied across all your devices.
-                </p>
               </div>
             </CardContent>
           </Card>
