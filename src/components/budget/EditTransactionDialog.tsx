@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, DollarSign, FileImage, X } from 'lucide-react';
+import { Calendar as CalendarIcon, DollarSign, FileImage, X, CreditCard, Wallet } from 'lucide-react';
 import { Transaction } from '@/types/budget';
 import { useBudget } from '@/context/BudgetContext';
 
@@ -36,6 +36,8 @@ const formSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   date: z.date(),
   type: z.enum(['income', 'expense']),
+  paymentMethod: z.enum(['cash', 'card']),
+  cardId: z.string().optional(),
   receiptImage: z.string().optional(),
 });
 
@@ -46,7 +48,7 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
   open, 
   onOpenChange 
 }) => {
-  const { updateTransaction, categories } = useBudget();
+  const { updateTransaction, categories, cards } = useBudget();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // Determine if it's income or expense based on amount
@@ -62,9 +64,14 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
       category: transaction.category,
       date: new Date(transaction.date),
       type: transactionType,
+      paymentMethod: transaction.paymentMethod || 'cash',
+      cardId: transaction.cardId || '',
       receiptImage: transaction.receiptImage || '',
     },
   });
+
+  // Watch the payment method to show/hide card selection
+  const paymentMethod = form.watch('paymentMethod');
 
   // Update preview image when transaction changes
   useEffect(() => {
@@ -85,6 +92,8 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
       ...data,
       amount: adjustedAmount,
       date: new Date(data.date),
+      // Only include cardId if payment method is card
+      cardId: data.paymentMethod === 'card' ? data.cardId : undefined,
     });
     
     onOpenChange(false);
@@ -207,6 +216,76 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
                 </FormItem>
               )}
             />
+
+            <FormField
+              control={form.control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Payment Method</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex space-x-4"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="cash" id="edit-cash" />
+                        </FormControl>
+                        <FormLabel htmlFor="edit-cash" className="flex items-center font-normal">
+                          <Wallet className="mr-1.5 h-4 w-4" />
+                          Cash
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="card" id="edit-card" />
+                        </FormControl>
+                        <FormLabel htmlFor="edit-card" className="flex items-center font-normal">
+                          <CreditCard className="mr-1.5 h-4 w-4" />
+                          Card
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {paymentMethod === 'card' && cards.length > 0 && (
+              <FormField
+                control={form.control}
+                name="cardId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Card</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value || undefined}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a card" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {cards.map((card) => (
+                          <SelectItem key={card.id} value={card.id}>
+                            {card.name} {card.cardNumber ? `(${card.cardNumber})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
+            {paymentMethod === 'card' && cards.length === 0 && (
+              <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+                No cards available. Please add a card in the Cards tab first.
+              </div>
+            )}
             
             <FormField
               control={form.control}
@@ -290,7 +369,12 @@ const EditTransactionDialog: React.FC<EditTransactionDialogProps> = ({
             </FormItem>
             
             <DialogFooter>
-              <Button type="submit">Save Changes</Button>
+              <Button 
+                type="submit" 
+                disabled={paymentMethod === 'card' && cards.length === 0}
+              >
+                Save Changes
+              </Button>
             </DialogFooter>
           </form>
         </Form>

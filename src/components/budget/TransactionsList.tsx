@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { Receipt, Pencil, Trash2, ArrowUp, ArrowDown, FileImage } from 'lucide-react';
+import { Receipt, Pencil, Trash2, ArrowUp, ArrowDown, FileImage, CreditCard, Wallet, AlertTriangle } from 'lucide-react';
 import { Transaction } from '@/types/budget';
 import { useBudget } from '@/context/BudgetContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,29 +20,56 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import EditTransactionDialog from './EditTransactionDialog';
 
 const TransactionsList = () => {
-  const { transactions, categories, deleteTransaction } = useBudget();
+  const { transactions, categories, deleteTransaction, cards } = useBudget();
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
 
   const handleEdit = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     setIsEditDialogOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    deleteTransaction(id);
+  const handleDeleteClick = (id: string) => {
+    setTransactionToDelete(id);
+  };
+
+  const confirmDelete = () => {
+    if (transactionToDelete) {
+      deleteTransaction(transactionToDelete);
+      setTransactionToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setTransactionToDelete(null);
   };
 
   const getCategoryName = (categoryId: string) => {
     const category = categories.find(cat => cat.id === categoryId);
     return category ? category.name : 'Uncategorized';
+  };
+
+  const getCardName = (cardId: string) => {
+    if (!cardId) return '';
+    const card = cards.find(c => c.id === cardId);
+    return card ? card.name : '';
   };
 
   const openImagePreview = (imageUrl: string) => {
@@ -72,6 +99,7 @@ const TransactionsList = () => {
                   <TableHead className="hidden md:table-cell">Category</TableHead>
                   <TableHead className="text-right">Amount</TableHead>
                   <TableHead className="hidden md:table-cell">Date</TableHead>
+                  <TableHead className="hidden md:table-cell">Payment</TableHead>
                   <TableHead className="text-center">Receipt</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -96,6 +124,9 @@ const TransactionsList = () => {
                         {transaction.description}
                         <div className="md:hidden text-xs text-muted-foreground mt-1">
                           {getCategoryName(transaction.category)} • {format(transaction.date, 'MMM d, yyyy')}
+                          {transaction.paymentMethod === 'card' && transaction.cardId && (
+                            <span> • {getCardName(transaction.cardId)}</span>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="hidden md:table-cell">{getCategoryName(transaction.category)}</TableCell>
@@ -103,6 +134,19 @@ const TransactionsList = () => {
                         ${Math.abs(transaction.amount).toFixed(2)}
                       </TableCell>
                       <TableCell className="hidden md:table-cell">{format(transaction.date, 'MMM d, yyyy')}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {transaction.paymentMethod === 'card' ? (
+                          <div className="flex items-center">
+                            <CreditCard className="h-3 w-3 mr-1 text-blue-500" />
+                            <span className="text-xs">{getCardName(transaction.cardId || '')}</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <Wallet className="h-3 w-3 mr-1 text-green-500" />
+                            <span className="text-xs">Cash</span>
+                          </div>
+                        )}
+                      </TableCell>
                       <TableCell className="text-center">
                         {transaction.receiptImage ? (
                           <Button
@@ -130,7 +174,7 @@ const TransactionsList = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(transaction.id)}
+                            onClick={() => handleDeleteClick(transaction.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                             <span className="sr-only">Delete</span>
@@ -167,6 +211,27 @@ const TransactionsList = () => {
           </DialogClose>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Delete Dialog */}
+      <AlertDialog open={!!transactionToDelete} onOpenChange={(open) => !open && setTransactionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Confirm Deletion
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this transaction? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDelete}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {selectedTransaction && (
         <EditTransactionDialog 

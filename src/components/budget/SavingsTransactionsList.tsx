@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { ArrowUpCircle, ArrowDownCircle, Trash2, FileImage } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, Trash2, FileImage, CreditCard, Wallet, AlertTriangle } from 'lucide-react';
 import { useBudget } from '@/context/BudgetContext';
 import {
   Table,
@@ -19,14 +19,25 @@ import {
   DialogTitle,
   DialogClose
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface SavingsTransactionsListProps {
   accountId: string;
 }
 
 const SavingsTransactionsList: React.FC<SavingsTransactionsListProps> = ({ accountId }) => {
-  const { savingsTransactions, deleteSavingsTransaction } = useBudget();
+  const { savingsTransactions, deleteSavingsTransaction, cards } = useBudget();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
   
   const filteredTransactions = savingsTransactions
     .filter(transaction => transaction.accountId === accountId)
@@ -43,6 +54,26 @@ const SavingsTransactionsList: React.FC<SavingsTransactionsListProps> = ({ accou
   const openImagePreview = (imageUrl: string) => {
     setPreviewImage(imageUrl);
   };
+
+  const handleDeleteClick = (id: string) => {
+    setTransactionToDelete(id);
+  };
+
+  const confirmDelete = () => {
+    if (transactionToDelete) {
+      deleteSavingsTransaction(transactionToDelete);
+      setTransactionToDelete(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setTransactionToDelete(null);
+  };
+
+  const getCardName = (cardId: string) => {
+    const card = cards.find(c => c.id === cardId);
+    return card ? card.name : '';
+  };
   
   return (
     <>
@@ -53,6 +84,7 @@ const SavingsTransactionsList: React.FC<SavingsTransactionsListProps> = ({ accou
             <TableHead>Description</TableHead>
             <TableHead className="text-right">Amount</TableHead>
             <TableHead className="hidden md:table-cell">Date</TableHead>
+            <TableHead className="hidden md:table-cell">Payment</TableHead>
             <TableHead className="text-center">Receipt</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -71,6 +103,9 @@ const SavingsTransactionsList: React.FC<SavingsTransactionsListProps> = ({ accou
                 {transaction.description}
                 <div className="md:hidden text-xs text-muted-foreground mt-1">
                   {format(transaction.date, 'MMM d, yyyy')}
+                  {transaction.paymentMethod === 'card' && transaction.cardId && (
+                    <span> • {getCardName(transaction.cardId)}</span>
+                  )}
                 </div>
               </TableCell>
               <TableCell className={`text-right font-medium ${transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600'}`}>
@@ -78,6 +113,19 @@ const SavingsTransactionsList: React.FC<SavingsTransactionsListProps> = ({ accou
               </TableCell>
               <TableCell className="hidden md:table-cell">
                 {format(transaction.date, 'MMM d, yyyy')}
+              </TableCell>
+              <TableCell className="hidden md:table-cell">
+                {transaction.paymentMethod === 'card' ? (
+                  <div className="flex items-center">
+                    <CreditCard className="h-3 w-3 mr-1 text-blue-500" />
+                    <span className="text-xs">{getCardName(transaction.cardId || '')}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <Wallet className="h-3 w-3 mr-1 text-green-500" />
+                    <span className="text-xs">Cash</span>
+                  </div>
+                )}
               </TableCell>
               <TableCell className="text-center">
                 {transaction.receiptImage ? (
@@ -97,7 +145,7 @@ const SavingsTransactionsList: React.FC<SavingsTransactionsListProps> = ({ accou
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => deleteSavingsTransaction(transaction.id)}
+                  onClick={() => handleDeleteClick(transaction.id)}
                 >
                   <Trash2 className="h-4 w-4" />
                   <span className="sr-only">Delete</span>
@@ -130,6 +178,27 @@ const SavingsTransactionsList: React.FC<SavingsTransactionsListProps> = ({ accou
           </DialogClose>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Delete Dialog */}
+      <AlertDialog open={!!transactionToDelete} onOpenChange={(open) => !open && setTransactionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Confirm Deletion
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this transaction? This will also update the account balance.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDelete}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };

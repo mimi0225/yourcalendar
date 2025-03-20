@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, DollarSign, FileImage, X } from 'lucide-react';
+import { Calendar as CalendarIcon, DollarSign, FileImage, X, CreditCard, Wallet } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -22,13 +22,15 @@ const formSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   date: z.date(),
   type: z.enum(['income', 'expense']),
+  paymentMethod: z.enum(['cash', 'card']),
+  cardId: z.string().optional(),
   receiptImage: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 const AddTransactionForm: React.FC = () => {
-  const { addTransaction, categories } = useBudget();
+  const { addTransaction, categories, cards } = useBudget();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const form = useForm<FormData>({
@@ -39,9 +41,14 @@ const AddTransactionForm: React.FC = () => {
       category: categories.length > 0 ? categories[0].id : '',
       date: new Date(),
       type: 'expense',
+      paymentMethod: 'cash',
+      cardId: '',
       receiptImage: '',
     },
   });
+
+  // Watch the payment method to show/hide card selection
+  const paymentMethod = form.watch('paymentMethod');
 
   const onSubmit = (data: FormData) => {
     // Adjust amount to negative for expenses
@@ -188,6 +195,76 @@ const AddTransactionForm: React.FC = () => {
             
             <FormField
               control={form.control}
+              name="paymentMethod"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel>Payment Method</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex space-x-4"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="cash" id="cash" />
+                        </FormControl>
+                        <FormLabel htmlFor="cash" className="flex items-center font-normal">
+                          <Wallet className="mr-1.5 h-4 w-4" />
+                          Cash
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="card" id="card" />
+                        </FormControl>
+                        <FormLabel htmlFor="card" className="flex items-center font-normal">
+                          <CreditCard className="mr-1.5 h-4 w-4" />
+                          Card
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {paymentMethod === 'card' && cards.length > 0 && (
+              <FormField
+                control={form.control}
+                name="cardId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Select Card</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a card" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {cards.map((card) => (
+                          <SelectItem key={card.id} value={card.id}>
+                            {card.name} {card.cardNumber ? `(${card.cardNumber})` : ''}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
+            {paymentMethod === 'card' && cards.length === 0 && (
+              <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-800">
+                No cards available. Please add a card in the Cards tab first.
+              </div>
+            )}
+            
+            <FormField
+              control={form.control}
               name="date"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
@@ -267,7 +344,13 @@ const AddTransactionForm: React.FC = () => {
               </div>
             </FormItem>
             
-            <Button type="submit" className="w-full">Add Transaction</Button>
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={paymentMethod === 'card' && cards.length === 0}
+            >
+              Add Transaction
+            </Button>
           </form>
         </Form>
       </CardContent>

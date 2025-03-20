@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign, Receipt, PiggyBank } from 'lucide-react';
+import { Calendar, LogOut, AlertTriangle, GraduationCap, Droplet, Trophy, Settings2, Clipboard, DollarSign, Receipt, PiggyBank, CreditCard, Tag } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSettings } from '@/context/SettingsContext';
@@ -23,8 +23,11 @@ import BudgetSummary from '@/components/budget/BudgetSummary';
 import AddTransactionForm from '@/components/budget/AddTransactionForm';
 import TransactionsList from '@/components/budget/TransactionsList';
 import AddCategoryForm from '@/components/budget/AddCategoryForm';
+import CategoriesList from '@/components/budget/CategoriesList';
 import AddSavingsAccountForm from '@/components/budget/AddSavingsAccountForm';
 import SavingsAccountsList from '@/components/budget/SavingsAccountsList';
+import AddCardForm from '@/components/budget/AddCardForm';
+import CardsList from '@/components/budget/CardsList';
 
 const Budget: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -116,11 +119,27 @@ const Budget: React.FC = () => {
       ) : (
         <div className="flex-grow">
           <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="mb-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="transactions">Transactions</TabsTrigger>
-              <TabsTrigger value="savings">Savings</TabsTrigger>
-              <TabsTrigger value="categories">Categories</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                <span className="hidden sm:inline">Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="transactions" className="flex items-center gap-2">
+                <Receipt className="h-4 w-4" />
+                <span className="hidden sm:inline">Transactions</span>
+              </TabsTrigger>
+              <TabsTrigger value="cards" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                <span className="hidden sm:inline">Cards</span>
+              </TabsTrigger>
+              <TabsTrigger value="savings" className="flex items-center gap-2">
+                <PiggyBank className="h-4 w-4" />
+                <span className="hidden sm:inline">Savings</span>
+              </TabsTrigger>
+              <TabsTrigger value="categories" className="flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                <span className="hidden sm:inline">Categories</span>
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="overview" className="space-y-6 mt-4">
@@ -138,6 +157,17 @@ const Budget: React.FC = () => {
               </div>
             </TabsContent>
             
+            <TabsContent value="cards" className="space-y-6 mt-4">
+              <div className="grid gap-6 md:grid-cols-3">
+                <div className="md:col-span-1">
+                  <AddCardForm />
+                </div>
+                <div className="md:col-span-2">
+                  <CardsList />
+                </div>
+              </div>
+            </TabsContent>
+            
             <TabsContent value="savings" className="space-y-6 mt-4">
               <div className="grid gap-6 md:grid-cols-3">
                 <div className="md:col-span-1">
@@ -150,9 +180,12 @@ const Budget: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="categories" className="space-y-6 mt-4">
-              <div className="grid gap-6 md:grid-cols-2">
-                <div>
+              <div className="grid gap-6 md:grid-cols-3">
+                <div className="md:col-span-1">
                   <AddCategoryForm />
+                </div>
+                <div className="md:col-span-2">
+                  <CategoriesList />
                 </div>
               </div>
             </TabsContent>
